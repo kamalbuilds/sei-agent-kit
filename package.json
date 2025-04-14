@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "description": "A package for building AI agents on the SEI blockchain",
   "main": "dist/index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "tsx test/index.ts"
+  },
   "keywords": [
     "sei",
     "sei-agent-kit",
