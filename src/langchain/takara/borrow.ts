@@ -1,13 +1,11 @@
 import { z } from "zod";
 import { StructuredTool } from "langchain/tools";
 import { SeiAgentKit } from "../../agent";
-import { borrowTakara } from "../../tools/takara";
-import { Address } from "viem";
 
 const SeiBorrowTakaraInputSchema = z.object({
-  tTokenAddress: z
+  ticker: z
     .string()
-    .describe("The address of the tToken to borrow against (e.g., tUSDC)"),
+    .describe("The token ticker (e.g., 'USDC', 'SEI')"),
   borrowAmount: z
     .string()
     .describe("The amount to borrow in human-readable format (e.g., '50' for 50 USDC)"),
@@ -25,25 +23,21 @@ export class SeiBorrowTakaraTool extends StructuredTool<typeof SeiBorrowTakaraIn
     super();
   }
 
-  protected async _call({ tTokenAddress, borrowAmount }: z.infer<typeof SeiBorrowTakaraInputSchema>): Promise<string> {
+  protected async _call({ ticker, borrowAmount }: z.infer<typeof SeiBorrowTakaraInputSchema>): Promise<string> {
     try {
-      if (!tTokenAddress) {
-        throw new Error("tTokenAddress is required");
+      if (!ticker) {
+        throw new Error("ticker is required");
       }
       if (!borrowAmount) {
         throw new Error("borrowAmount is required");
       }
 
-      const result = await borrowTakara(this.seiKit, {
-        tTokenAddress: tTokenAddress as Address,
-        borrowAmount,
-      });
+      const result = await this.seiKit.borrowTakara(ticker, borrowAmount);
 
       return JSON.stringify({
         status: "success",
-        message: `Successfully borrowed tokens. Transaction hash: ${result.txHash}. Borrow amount: ${result.borrowedAmount}`,
-        txHash: result.txHash,
-        borrowedAmount: result.borrowedAmount,
+        message: `Successfully borrowed tokens. Transaction hash: ${result}`,
+        txHash: result,
       });
     } catch (error: any) {
       return JSON.stringify({

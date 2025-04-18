@@ -1,13 +1,12 @@
 import { z } from "zod";
 import { StructuredTool } from "langchain/tools";
 import { SeiAgentKit } from "../../agent";
-import { getRedeemableAmount, getBorrowBalance } from "../../tools/takara";
 import { Address } from "viem";
 
 const SeiGetRedeemableAmountInputSchema = z.object({
-  tTokenAddress: z
+  ticker: z
     .string()
-    .describe("The address of the tToken (e.g., tUSDC)"),
+    .describe("The token ticker (e.g., 'USDC', 'SEI')"),
   userAddress: z
     .string()
     .optional()
@@ -26,9 +25,9 @@ export class SeiGetRedeemableAmountTool extends StructuredTool<typeof SeiGetRede
     super();
   }
 
-  protected async _call({ tTokenAddress, userAddress }: z.infer<typeof SeiGetRedeemableAmountInputSchema>): Promise<string> {
+  protected async _call({ ticker, userAddress }: z.infer<typeof SeiGetRedeemableAmountInputSchema>): Promise<string> {
     try {
-      const result = await getRedeemableAmount(this.seiKit, tTokenAddress as Address, userAddress as Address);
+      const result = await this.seiKit.getRedeemableAmount(ticker, userAddress as Address);
 
       return JSON.stringify({
         status: "success",
@@ -50,9 +49,9 @@ export class SeiGetRedeemableAmountTool extends StructuredTool<typeof SeiGetRede
 }
 
 const SeiGetBorrowBalanceInputSchema = z.object({
-  tTokenAddress: z
+  ticker: z
     .string()
-    .describe("The address of the tToken (e.g., tUSDC)"),
+    .describe("The token ticker (e.g., 'USDC', 'SEI')"),
   userAddress: z
     .string()
     .optional()
@@ -71,9 +70,9 @@ export class SeiGetBorrowBalanceTool extends StructuredTool<typeof SeiGetBorrowB
     super();
   }
 
-  protected async _call({ tTokenAddress, userAddress }: z.infer<typeof SeiGetBorrowBalanceInputSchema>): Promise<string> {
+  protected async _call({ ticker, userAddress }: z.infer<typeof SeiGetBorrowBalanceInputSchema>): Promise<string> {
     try {
-      const result = await getBorrowBalance(this.seiKit, tTokenAddress as Address, userAddress as Address);
+      const result = await this.seiKit.getBorrowBalance(ticker, userAddress as Address);
 
       return JSON.stringify({
         status: "success",

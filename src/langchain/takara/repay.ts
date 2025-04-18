@@ -1,13 +1,11 @@
 import { z } from "zod";
 import { StructuredTool } from "langchain/tools";
 import { SeiAgentKit } from "../../agent";
-import { repayTakara } from "../../tools/takara";
-import { Address } from "viem";
 
 const SeiRepayTakaraInputSchema = z.object({
-  tTokenAddress: z
+  ticker: z
     .string()
-    .describe("The address of the tToken to repay (e.g., tUSDC)"),
+    .describe("The token ticker (e.g., 'USDC', 'SEI')"),
   repayAmount: z
     .string()
     .describe("The amount to repay in human-readable format (e.g., '50' for 50 USDC). Use 'MAX' to repay full balance"),
@@ -25,18 +23,14 @@ export class SeiRepayTakaraTool extends StructuredTool<typeof SeiRepayTakaraInpu
     super();
   }
 
-  protected async _call({ tTokenAddress, repayAmount }: z.infer<typeof SeiRepayTakaraInputSchema>): Promise<string> {
+  protected async _call({ ticker, repayAmount }: z.infer<typeof SeiRepayTakaraInputSchema>): Promise<string> {
     try {
-      const result = await repayTakara(this.seiKit, {
-        tTokenAddress: tTokenAddress as Address,
-        repayAmount,
-      });
+      const result = await this.seiKit.repayTakara(ticker, repayAmount);
 
       return JSON.stringify({
         status: "success",
-        message: `Successfully repaid tokens. Transaction hash: ${result.txHash}. Repay amount: ${result.repaidAmount}`,
-        txHash: result.txHash,
-        repaidAmount: result.repaidAmount,
+        message: `Successfully repaid tokens. Transaction hash: ${result}`,
+        txHash: result,
       });
     } catch (error: any) {
       return JSON.stringify({

@@ -1,13 +1,11 @@
 import { z } from "zod";
 import { StructuredTool } from "langchain/tools";
 import { SeiAgentKit } from "../../agent";
-import { redeemTakara } from "../../tools/takara";
-import { Address } from "viem";
 
 const SeiRedeemTakaraInputSchema = z.object({
-  tTokenAddress: z
+  ticker: z
     .string()
-    .describe("The address of the tToken to redeem (e.g., tUSDC)"),
+    .describe("The token ticker (e.g., 'USDC', 'SEI')"),
   redeemAmount: z
     .string()
     .describe("The amount to redeem in human-readable format (e.g., '50' for 50 USDC). Use 'MAX' to redeem all tTokens"),
@@ -29,29 +27,14 @@ export class SeiRedeemTakaraTool extends StructuredTool<typeof SeiRedeemTakaraIn
     super();
   }
 
-  protected async _call({ tTokenAddress, redeemAmount, redeemType = "underlying" }: z.infer<typeof SeiRedeemTakaraInputSchema>): Promise<string> {
+  protected async _call({ ticker, redeemAmount, redeemType = "underlying" }: z.infer<typeof SeiRedeemTakaraInputSchema>): Promise<string> {
     try {
-      const result = await redeemTakara(this.seiKit, {
-        tTokenAddress: tTokenAddress as Address,
-        redeemAmount,
-        redeemType,
-      });
-
-      let message = `Redeem transaction hash: ${result.txHash}.`;
-      if (result.success) {
-        message += ` Successfully redeemed ${result.redeemedAmount} tokens.`;
-      } else {
-        message += ` Warning: Expected to receive ${result.expected} tokens but got ${result.actual}. This may indicate an issue with the redemption.`;
-      }
+      const result = await this.seiKit.redeemTakara(ticker, redeemAmount, redeemType);
 
       return JSON.stringify({
         status: "success",
-        success: result.success,
-        message,
-        txHash: result.txHash,
-        redeemedAmount: result.redeemedAmount,
-        expected: result.expected,
-        actual: result.actual,
+        message: `Successfully redeemed tTokens. Transaction hash: ${result}`,
+        txHash: result,
       });
     } catch (error: any) {
       return JSON.stringify({

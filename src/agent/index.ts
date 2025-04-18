@@ -9,7 +9,7 @@ import {
 } from "viem";
 import { sei } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
-import { get_erc20_balance, erc20_transfer, get_erc721_balance, erc721Transfer, erc721Mint, stakeSei, unstakeSei, getTokenAddressFromTicker, addLiquidity, removeLiquidity } from '../tools';
+import { get_erc20_balance, erc20_transfer, get_erc721_balance, erc721Transfer, erc721Mint, stakeSei, unstakeSei, getTokenAddressFromTicker, addLiquidity, removeLiquidity} from '../tools';
 import { Config } from '../interfaces';
 import {
   mintTakara,
@@ -18,7 +18,8 @@ import {
   redeemTakara,
   getRedeemableAmount,
   getBorrowBalance,
-  type RedeemTakaraParams
+  type RedeemTakaraParams,
+  getTakaraTTokenAddress
 } from '../tools/takara';
 import { swap } from '../tools/symphony/swap';
 
@@ -40,10 +41,7 @@ export class SeiAgentKit {
     const account = privateKeyToAccount(private_key as Address);
     this.publicClient = createPublicClient({
       chain: sei,
-      transport: http(),
-      batch: {
-        multicall: true
-      }
+      transport: http()
     });
     this.wallet_address = account.address;
     this.walletClient = createWalletClient({
@@ -54,9 +52,9 @@ export class SeiAgentKit {
 
     // Handle both old and new patterns
     if (typeof configOrKey === "string" || configOrKey === null) {
-      this.config = { OPENAI_API_KEY: configOrKey || "" } as Config;
+      this.config = { OPENAI_API_KEY: configOrKey || "" };
     } else {
-      this.config = configOrKey as Config;
+      this.config = configOrKey;
     }
   }
 
@@ -165,66 +163,73 @@ export class SeiAgentKit {
     return swap(this, amount, tokenIn, tokenOut);
   }
 
-
   // Takara Protocol methods
   /**
    * Mints tTokens by depositing underlying tokens into the Takara Protocol
-   * @param tTokenAddress The address of the tToken to mint
+   * @param ticker The token ticker (e.g., "USDC")
    * @param mintAmount The amount to mint in human-readable format
    * @returns Transaction hash and expected tToken amount
    */
-  async mintTakara(tTokenAddress: Address, mintAmount: string) {
-    return mintTakara(this, { tTokenAddress, mintAmount });
+  async mintTakara(ticker: string, mintAmount: string) {
+    return mintTakara(this, { ticker, mintAmount });
   }
 
   /**
    * Borrows underlying tokens from the Takara Protocol using tTokens as collateral
-   * @param tTokenAddress The address of the tToken to borrow against
+   * @param ticker The token ticker (e.g., "USDC")
    * @param borrowAmount The amount to borrow in human-readable format
    * @returns Transaction hash and borrowed amount
    */
-  async borrowTakara(tTokenAddress: Address, borrowAmount: string) {
-    return borrowTakara(this, { tTokenAddress, borrowAmount });
+  async borrowTakara(ticker: string, borrowAmount: string) {
+    return borrowTakara(this, { ticker, borrowAmount });
   }
 
   /**
    * Repays borrowed tokens to the Takara Protocol
-   * @param tTokenAddress The address of the tToken to repay
+   * @param ticker The token ticker (e.g., "USDC")
    * @param repayAmount The amount to repay in human-readable format, or "MAX" to repay full balance
    * @returns Transaction hash and amount repaid
    */
-  async repayTakara(tTokenAddress: Address, repayAmount: string) {
-    return repayTakara(this, { tTokenAddress, repayAmount });
+  async repayTakara(ticker: string, repayAmount: string) {
+    return repayTakara(this, { ticker, repayAmount });
   }
 
   /**
    * Redeems tTokens from the Takara Protocol to get underlying tokens back
-   * @param tTokenAddress The address of the tToken to redeem
+   * @param ticker The token ticker (e.g., "USDC")
    * @param redeemAmount The amount to redeem in human-readable format, or "MAX" to redeem all
    * @param redeemType Whether to redeem underlying tokens or tTokens
    * @returns Transaction details and redemption status
    */
-  async redeemTakara(tTokenAddress: Address, redeemAmount: string, redeemType: RedeemTakaraParams['redeemType'] = 'underlying') {
-    return redeemTakara(this, { tTokenAddress, redeemAmount, redeemType });
+  async redeemTakara(ticker: string, redeemAmount: string, redeemType: RedeemTakaraParams['redeemType'] = 'underlying') {
+    return redeemTakara(this, { ticker, redeemAmount, redeemType });
   }
 
   /**
    * Calculates the amount of underlying tokens that can be redeemed by a user
-   * @param tTokenAddress The address of the tToken
+   * @param ticker The token ticker (e.g., "USDC")
    * @param userAddress Optional address of the user to check
    * @returns Information about redeemable amounts
    */
-  async getRedeemableAmount(tTokenAddress: Address, userAddress?: Address) {
+  async getRedeemableAmount(ticker: string, userAddress?: Address) {
+    const tTokenAddress = getTakaraTTokenAddress(ticker);
+    if (!tTokenAddress) {
+      throw new Error(`No Takara tToken found for ticker: ${ticker}`);
+    }
     return getRedeemableAmount(this, tTokenAddress, userAddress);
   }
 
   /**
    * Retrieves the current borrow balance for a user
-   * @param tTokenAddress The address of the tToken
+   * @param ticker The token ticker (e.g., "USDC")
    * @param userAddress Optional address of the user to check
    * @returns Information about the borrow balance
    */
-  async getBorrowBalance(tTokenAddress: Address, userAddress?: Address) {
+  async getBorrowBalance(ticker: string, userAddress?: Address) {
+    const tTokenAddress = getTakaraTTokenAddress(ticker);
+    if (!tTokenAddress) {
+      throw new Error(`No Takara tToken found for ticker: ${ticker}`);
+    }
     return getBorrowBalance(this, tTokenAddress, userAddress);
   }
 
