@@ -4,15 +4,13 @@
   <br>
 </div>
 
-<h4 align="center">The Complete Development Toolkit for Building AI AGENTS on <a href="https://www.sei.io/" target="_blank">SEI</a> Blockchain</h4>
+<h4 align="center">The Complete Development Toolkit for Building AI AGENTS on <a href="https://www.sei.io/" target="_blank">SEI</a> </h4>
 
 <p align="center">
   <a href="#-features">Features</a> •
   <a href="#-supported-protocols">Protocols</a> •
-  <a href="#%EF%B8%8F-installation">Installation</a> •
-  <a href="#-usage">Usage</a> •
-  <a href="#-examples">Examples</a> •
-  <a href="#-contributing">Contributing</a>
+  <a href="#-quickstart">Quickstart</a> •
+  <a href="#-links">Links</a>
 </p>
 
 <hr>
