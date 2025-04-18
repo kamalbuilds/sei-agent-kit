@@ -4,11 +4,89 @@
   <br>
 </div>
 
-<h4 align="center">The SDK for Building AI AGENTS on <a href="https://www.sei.io/" target="_blank">SEI</a> Blockchain</h4>
+<h4 align="center">The Complete Development Toolkit for Building AI AGENTS on <a href="https://www.sei.io/" target="_blank">SEI</a> Blockchain</h4>
 
+<p align="center">
+  <a href="#-features">Features</a> •
+  <a href="#-supported-protocols">Protocols</a> •
+  <a href="#%EF%B8%8F-installation">Installation</a> •
+  <a href="#-usage">Usage</a> •
+  <a href="#-examples">Examples</a> •
+  <a href="#-contributing">Contributing</a>
+</p>
 
 <hr>
 
-<h2 align="center">Coming Soon... Stay tuned on <a href="https://x.com/cambrian_ai">Twitter</a> for updates</h2>
+## 🪲 Introduction
+
+**Cambrian Agent Kit** is a comprehensive SDK designed to simplify the development of AI Agents on the SEI blockchain. It provides a unified interface for interacting with various DeFi protocols, token standards, and AI services, allowing developers to build powerful blockchain agents with minimal code.
+
+This toolkit bridges the gap between AI and blockchain interaction, enabling the creation of autonomous agents and agentic chatbots that can perform operations on the SEI network.
+
+## ✨ Features
+
+- **Token Operations**: Complete SEI ERC-20 and ERC-721 token management
+- **DeFi Protocol Integration**: Seamless interaction with SEI's DeFi ecosystem
+- **Swap Functionality**: Token swapping through Symphony aggregator
+- **Liquidity Management**: Add and remove liquidity with DragonSwap
+- **Lending & Borrowing**: Interact with Takara protocol for lending operations
+- **Staking Operations**: Stake and unstake SEI tokens with Silo
+- **LangChain Integration**: Build AI agents with LangChain and LangGraph
+
+## 📋 Supported Protocols
+
+The Cambrian Agent Kit integrates with a variety of protocols and services:
+
+### DeFi Protocols
+- **Symphony**: Token swapping and routing
+- **DragonSwap**: Liquidity pool operations
+- **Takara**: Lending and borrowing platform
+- **Silo**: Staking and yield farming
+
+### Token Standards
+- **SEI ERC-20**: Complete token operations
+- **SEI ERC-721**: NFT token management
+
+## 🔧 Quickstart
+
+#### Configuration
+
+Create a `.env` file with your API keys and configurations:
+
+```bash
+cp .env.example .env
+```
+
+Required environment variables:
+```
+OPENAI_API_KEY=your_openai_api_key
+SEI_PRIVATE_KEY=your_wallet_private_key
+RPC_URL=https://evm-rpc.sei-apis.com
+```
+
+#### Install dependencies
+
+```bash
+npm install
+```
+
+#### Run the sample agent
+
+```bash
+npm run test
+```
+
+## 🔗 Links
+
+- [Twitter](https://x.com/cambrian_ai)
+- [Website](https://cambrian.wtf)
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
