@@ -5,7 +5,6 @@ import { MemorySaver } from "@langchain/langgraph";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { ChatOpenAI } from "@langchain/openai";
 import * as dotenv from "dotenv";
-import { sleep } from "openai/core";
 import * as readline from "readline";
 
 dotenv.config();
@@ -71,7 +70,6 @@ async function setupAgent() {
 }
 
 async function startInteractiveSession(agent: any, config: any) {
-  await sleep(1000);
   console.log("\nStarting chat with the Cambrian Agent... Type 'bye' to end.");
 
   const rl = readline.createInterface({
