@@ -43,13 +43,12 @@ export async function unstakeSei(
     if (!seiBridge) {
       throw new Error("SEI bridge utility is not available");
     }
-    const gas = await agent.publicClient.estimateGas({ account: agent.walletClient.account });
+    
     const tx_hash = await seiBridge({
       agent,
       executeMsg,
       fundsMsg,
       chainConfig,
-      amount,
     });
 
     if (!tx_hash) {
