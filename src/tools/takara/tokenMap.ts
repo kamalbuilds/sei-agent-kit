@@ -5,11 +5,11 @@ import { Address } from 'viem';
  * Mapping of token tickers to their corresponding Takara tToken addresses
  */
 export const TAKARA_TOKEN_MAP: Record<string, Address> = {
-    "Sei": "0xA26b9BFe606d29F16B5Aecf30F9233934452c4E2",
+    "SEI": "0xA26b9BFe606d29F16B5Aecf30F9233934452c4E2",
     "USDC": "0xC3c9e322F4aAe352ace79D0E62ADe3563fB86e87",
     "USDT": "0xc68351B9B3638A6f4A3Ae100Bd251e227BbD7479",
-    "fastUSD": "0x92e51466482146E71b692ced2265284968E8B3d6",
-    "iSEI": "0xda642A7821E91eD285262fead162E5fd17200429",
+    "FASTUSD": "0x92e51466482146E71b692ced2265284968E8B3d6",
+    "ISEI": "0xda642A7821E91eD285262fead162E5fd17200429",
 };
 
 /**
