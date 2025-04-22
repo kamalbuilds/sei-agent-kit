@@ -27,6 +27,7 @@ export async function addLiquidity(
   tickLower: number,
   tickUpper: number,
 ): Promise<string> {
+  console.log(`Adding liquidity: ${amount0} of ${token0} and ${amount1} of ${token1}...`);
   try {
     const positionManagerAddress = "0xa7FDcBe645d6b2B98639EbacbC347e2B575f6F70" as Address;
     const parsedAmount0 = parseUnits(amount0, await getTokenDecimals(agent, token0));

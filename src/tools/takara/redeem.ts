@@ -37,6 +37,7 @@ export async function redeemTakara(agent: SeiAgentKit, {
   actual: string,
   success: boolean
 }> {
+  console.log(`Redeeming ${redeemAmount} ${ticker} from Takara...`);
   const tTokenAddress = getTakaraTTokenAddress(ticker);
   if (!tTokenAddress) {
     throw new Error(`Invalid ticker: ${ticker}`);

@@ -26,6 +26,7 @@ export async function getRedeemableAmount(
   underlyingDecimals: number,
   underlyingTokenAddress: Address
 }> {
+  console.log(`Querying redeemable amount for ${ticker} from address ${userAddress || agent.wallet_address}...`);
   const tTokenAddress = getTakaraTTokenAddress(ticker);
   if (!tTokenAddress) {
     throw new Error(`Invalid ticker: ${ticker}`);
@@ -98,6 +99,7 @@ export async function getBorrowBalance(
   underlyingDecimals: number,
   underlyingTokenAddress: Address
 }> {
+  console.log(`Querying borrow balance for ${ticker} from address ${userAddress || agent.wallet_address}...`);
   const tTokenAddress = getTakaraTTokenAddress(ticker);
   if (!tTokenAddress) {
     throw new Error(`Invalid ticker: ${ticker}`);

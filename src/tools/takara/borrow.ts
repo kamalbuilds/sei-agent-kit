@@ -30,6 +30,7 @@ export async function borrowTakara(agent: SeiAgentKit, {
   ticker,
   borrowAmount
 }: BorrowTakaraParams): Promise<Address> {
+  console.log(`Borrowing ${borrowAmount} ${ticker} from Takara...`);
   const tTokenAddress = getTakaraTTokenAddress(ticker);
   if (!tTokenAddress) {
     throw new Error(`Invalid ticker: ${ticker}`);

@@ -115,6 +115,5 @@ export interface MintTakaraParams {
     args: [agent.wallet_address],
   });
 
-
   return mintTxHash;
 } 

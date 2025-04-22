@@ -13,6 +13,7 @@ export async function unstakeSei(
   agent: SeiAgentKit,
   amount: string
 ): Promise<string> {
+  console.log(`Unstaking ${amount} SEI...`);
   const amountNum = Number(amount);
   if (isNaN(amountNum) || amountNum <= 0) {
     const errorMsg = `Invalid unstaking amount: ${amount}. Amount must be a positive number.`;

@@ -13,6 +13,7 @@ export async function stakeSei(
   agent: SeiAgentKit,
   amount: string
 ): Promise<string> {
+  console.log(`Staking ${amount} SEI...`);
   const amountNum = Number(amount);
   if (isNaN(amountNum) || amountNum <= 0) {
     const errorMsg = `Invalid staking amount: ${amount}. Amount must be a positive number.`;

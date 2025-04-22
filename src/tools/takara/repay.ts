@@ -33,6 +33,7 @@ export async function repayTakara(agent: SeiAgentKit, {
   txHash: Hash,
   repaidAmount: string
 }> {
+  console.log(`Repaying ${repayAmount} ${ticker} to Takara...`);
   const tTokenAddress = getTakaraTTokenAddress(ticker);
   if (!tTokenAddress) {
     throw new Error(`Invalid ticker: ${ticker}`);

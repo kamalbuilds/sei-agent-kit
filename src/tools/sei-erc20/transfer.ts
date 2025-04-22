@@ -17,6 +17,8 @@ export async function erc20_transfer(
   recipient: Address,
   ticker?: string,
 ): Promise<string> {
+  console.log(`Transferring ${amount} ${ticker || 'SEI'} to ${recipient}...`);
+
   if (Number(amount) <= 0) {
     const errorMsg = "Transfer amount must be greater than 0";
     throw new Error(errorMsg);

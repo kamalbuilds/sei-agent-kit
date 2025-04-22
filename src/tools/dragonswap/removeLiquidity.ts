@@ -16,6 +16,7 @@ export async function removeLiquidity(
   tokenId: bigint,
   liquidity?: bigint,
 ): Promise<string> {
+  console.log(`Removing liquidity for position ID ${tokenId}...`);
   try {
     if (!agent.publicClient || !agent.walletClient) {
       throw new Error("Public client or wallet client not initialized");

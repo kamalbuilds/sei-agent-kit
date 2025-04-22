@@ -17,7 +17,7 @@ export async function swap(
   tokenOut: Address,
 ): Promise<string> {
   try {
-    console.log("Swapping tokens...");
+    console.log(`Swapping ${amount} ${tokenIn} to ${tokenOut}...`);
     const symphonySDK = new Symphony({ walletClient: agent.walletClient });
 
     // Connect wallet client to Symphony SDK
@@ -29,7 +29,6 @@ export async function swap(
       tokenOut,
       amount
     );
-    console.log(route);
     // Check if approval is needed
     const isApproved = await route.checkApproval();
     if (!isApproved) {
