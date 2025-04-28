@@ -9,7 +9,23 @@ import {
 } from "viem";
 import { sei } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
-import { get_erc20_balance, erc20_transfer, get_erc721_balance, erc721Transfer, erc721Mint, stakeSei, unstakeSei, getTokenAddressFromTicker, addLiquidity, removeLiquidity} from '../tools';
+import { TradeActionBNStr, PayableOverrides, StrategyUpdate, EncodedStrategyBNStr } from '@bancor/carbon-sdk';
+import { ContractsConfig } from '@bancor/carbon-sdk/contracts-api';
+import { MarginalPriceOptions } from '@bancor/carbon-sdk/strategy-management';
+import {
+  get_erc20_balance, erc20_transfer, get_erc721_balance, erc721Transfer, erc721Mint, stakeSei, unstakeSei, getTokenAddressFromTicker, addLiquidity, removeLiquidity,
+  composeTradeBySourceTx,
+  composeTradeByTargetTx,
+  createBuySellStrategy,
+  deleteStrategy,
+  getLiquidityByPair,
+  getMaxRateByPair,
+  getMinRateByPair,
+  getRateLiquidityDepthsByPair,
+  getUserStrategies,
+  hasLiquidityByPair,
+  updateStrategy,
+} from '../tools';
 import { Config } from '../interfaces';
 import {
   mintTakara,
@@ -163,13 +179,14 @@ export class SeiAgentKit {
     return swap(this, amount, tokenIn, tokenOut);
   }
 
+  
   // Takara Protocol methods
   /**
    * Mints tTokens by depositing underlying tokens into the Takara Protocol
    * @param ticker The token ticker (e.g., "USDC")
    * @param mintAmount The amount to mint in human-readable format
    * @returns Transaction hash and expected tToken amount
-   */
+  */
   async mintTakara(ticker: string, mintAmount: string) {
     return mintTakara(this, { ticker, mintAmount });
   }
@@ -179,7 +196,7 @@ export class SeiAgentKit {
    * @param ticker The token ticker (e.g., "USDC")
    * @param borrowAmount The amount to borrow in human-readable format
    * @returns Transaction hash and borrowed amount
-   */
+  */
   async borrowTakara(ticker: string, borrowAmount: string) {
     return borrowTakara(this, { ticker, borrowAmount });
   }
@@ -193,46 +210,46 @@ export class SeiAgentKit {
   async repayTakara(ticker: string, repayAmount: string) {
     return repayTakara(this, { ticker, repayAmount });
   }
-
+  
   /**
    * Redeems tTokens from the Takara Protocol to get underlying tokens back
    * @param ticker The token ticker (e.g., "USDC")
    * @param redeemAmount The amount to redeem in human-readable format, or "MAX" to redeem all
    * @param redeemType Whether to redeem underlying tokens or tTokens
    * @returns Transaction details and redemption status
-   */
-  async redeemTakara(ticker: string, redeemAmount: string, redeemType: RedeemTakaraParams['redeemType'] = 'underlying') {
-    return redeemTakara(this, { ticker, redeemAmount, redeemType });
+  */
+ async redeemTakara(ticker: string, redeemAmount: string, redeemType: RedeemTakaraParams['redeemType'] = 'underlying') {
+   return redeemTakara(this, { ticker, redeemAmount, redeemType });
   }
-
+  
   /**
    * Calculates the amount of underlying tokens that can be redeemed by a user
    * @param ticker The token ticker (e.g., "USDC")
    * @param userAddress Optional address of the user to check
    * @returns Information about redeemable amounts
-   */
-  async getRedeemableAmount(ticker: string, userAddress?: Address) {
-    const tTokenAddress = getTakaraTTokenAddress(ticker);
-    if (!tTokenAddress) {
-      throw new Error(`No Takara tToken found for ticker: ${ticker}`);
+  */
+ async getRedeemableAmount(ticker: string, userAddress?: Address) {
+   const tTokenAddress = getTakaraTTokenAddress(ticker);
+   if (!tTokenAddress) {
+     throw new Error(`No Takara tToken found for ticker: ${ticker}`);
     }
     return getRedeemableAmount(this, tTokenAddress, userAddress);
   }
-
+  
   /**
    * Retrieves the current borrow balance for a user
    * @param ticker The token ticker (e.g., "USDC")
    * @param userAddress Optional address of the user to check
    * @returns Information about the borrow balance
-   */
-  async getBorrowBalance(ticker: string, userAddress?: Address) {
-    const tTokenAddress = getTakaraTTokenAddress(ticker);
-    if (!tTokenAddress) {
-      throw new Error(`No Takara tToken found for ticker: ${ticker}`);
+  */
+ async getBorrowBalance(ticker: string, userAddress?: Address) {
+   const tTokenAddress = getTakaraTTokenAddress(ticker);
+   if (!tTokenAddress) {
+     throw new Error(`No Takara tToken found for ticker: ${ticker}`);
     }
     return getBorrowBalance(this, tTokenAddress, userAddress);
   }
-
+  
   // DragonSwap methods
   /**
    * Adds liquidity to a DragonSwap pool
@@ -244,15 +261,15 @@ export class SeiAgentKit {
    * @param tickLower The lower tick of the position
    * @param tickUpper The upper tick of the position
    * @returns Transaction hash or details
-   */
-  async addDragonSwapLiquidity(
-    token0: Address,
-    token1: Address,
-    amount0: string,
-    amount1: string,
-    fee: number,
-    tickLower: number,
-    tickUpper: number,
+  */
+ async addDragonSwapLiquidity(
+   token0: Address,
+   token1: Address,
+   amount0: string,
+   amount1: string,
+   fee: number,
+   tickLower: number,
+   tickUpper: number,
   ): Promise<string> {
     return addLiquidity(
       this,
@@ -265,17 +282,224 @@ export class SeiAgentKit {
       tickUpper
     );
   }
-
+  
   /**
    * Removes liquidity from a DragonSwap pool
    * @param tokenId The ID of the NFT position token
    * @param liquidity Optional: The amount of liquidity to remove (if undefined, removes all)
    * @returns Transaction hash or details
-   */
-  async removeDragonSwapLiquidity(
-    tokenId: bigint,
-    liquidity?: bigint,
+  */
+ async removeDragonSwapLiquidity(
+   tokenId: bigint,
+   liquidity?: bigint,
   ): Promise<string> {
     return removeLiquidity(this, tokenId, liquidity);
   }
+
+  // Carbon SDK Methods
+  /**
+   * Composes a trade transaction based on the source token amount using Carbon SDK.
+   * @param config The Carbon contracts configuration.
+   * @param sourceToken The address of the source token.
+   * @param targetToken The address of the target token.
+   * @param tradeActions An array of trade actions.
+   * @param deadline The transaction deadline timestamp.
+   * @param minReturn The minimum amount of target tokens to receive.
+   * @param overrides Optional transaction overrides.
+   * @returns Promise with the transaction hash or null.
+   */
+  async composeTradeBySourceTx(
+    config: ContractsConfig,
+    sourceToken: string,
+    targetToken: string,
+    tradeActions: TradeActionBNStr[],
+    deadline: string,
+    minReturn: string,
+    overrides?: PayableOverrides
+  ): Promise<string | null> {
+    return composeTradeBySourceTx(this, config, sourceToken, targetToken, tradeActions, deadline, minReturn, overrides);
+  }
+  
+  /**
+   * Composes a trade transaction based on the target token amount using Carbon SDK.
+   * @param config The Carbon contracts configuration.
+   * @param sourceToken The address of the source token.
+   * @param targetToken The address of the target token.
+   * @param tradeActions An array of trade actions.
+   * @param deadline The transaction deadline timestamp.
+   * @param maxInput The maximum amount of source tokens to spend.
+   * @param overrides Optional transaction overrides.
+   * @returns Promise with the transaction hash or null.
+   */
+  async composeTradeByTargetTx(
+    config: ContractsConfig,
+    sourceToken: string,
+    targetToken: string,
+    tradeActions: TradeActionBNStr[],
+    deadline: string,
+    maxInput: string,
+    overrides?: PayableOverrides
+  ): Promise<string | null> {
+    return composeTradeByTargetTx(this, config, sourceToken, targetToken, tradeActions, deadline, maxInput, overrides);
+  }
+  
+  /**
+   * Creates a buy/sell strategy using Carbon SDK.
+   * @param config The Carbon contracts configuration.
+   * @param baseToken The address of the base token.
+   * @param quoteToken The address of the quote token.
+   * @param buyPriceLow The lower bound of the buy price range.
+   * @param buyPriceMarginal The marginal buy price.
+   * @param buyPriceHigh The upper bound of the buy price range.
+   * @param buyBudget The budget allocated for buying.
+   * @param sellPriceLow The lower bound of the sell price range.
+   * @param sellPriceMarginal The marginal sell price.
+   * @param sellPriceHigh The upper bound of the sell price range.
+   * @param sellBudget The budget allocated for selling.
+   * @param overrides Optional transaction overrides.
+   * @returns Promise with the transaction hash or null.
+   */
+  async createBuySellStrategy(
+    config: ContractsConfig,
+    baseToken: string,
+    quoteToken: string,
+    buyPriceLow: string,
+    buyPriceMarginal: string,
+    buyPriceHigh: string,
+    buyBudget: string,
+    sellPriceLow: string,
+    sellPriceMarginal: string,
+    sellPriceHigh: string,
+    sellBudget: string,
+    overrides?: PayableOverrides
+  ): Promise<string | null> {
+    return createBuySellStrategy(this, config, baseToken, quoteToken, buyPriceLow, buyPriceMarginal, buyPriceHigh, buyBudget, sellPriceLow, sellPriceMarginal, sellPriceHigh, sellBudget, overrides);
+  }
+  
+  /**
+   * Deletes a strategy using Carbon SDK.
+   * @param config The Carbon contracts configuration.
+   * @param strategyId The ID of the strategy to delete.
+   * @returns Promise with the transaction hash or null.
+   */
+  async deleteStrategy(
+    config: ContractsConfig,
+    strategyId: string
+  ): Promise<string | null> {
+    return deleteStrategy(this, config, strategyId);
+  }
+  
+  /**
+   * Gets the liquidity for a token pair using Carbon SDK.
+   * @param config The Carbon contracts configuration.
+   * @param sourceToken The address of the source token.
+   * @param targetToken The address of the target token.
+   * @returns Promise with the liquidity information or null.
+   */
+  async getLiquidityByPair(
+    config: ContractsConfig,
+    sourceToken: string,
+    targetToken: string
+  ): Promise<string | null> {
+    return getLiquidityByPair(this, config, sourceToken, targetToken);
+  }
+  
+  /**
+   * Gets the maximum rate for a token pair using Carbon SDK.
+   * @param config The Carbon contracts configuration.
+   * @param sourceToken The address of the source token.
+   * @param targetToken The address of the target token.
+   * @returns Promise with the maximum rate or null.
+   */
+  async getMaxRateByPair(
+    config: ContractsConfig,
+    sourceToken: string,
+    targetToken: string
+  ): Promise<string | null> {
+    return getMaxRateByPair(this, config, sourceToken, targetToken);
+  }
+  
+  /**
+   * Gets the minimum rate for a token pair using Carbon SDK.
+   * @param config The Carbon contracts configuration.
+   * @param sourceToken The address of the source token.
+   * @param targetToken The address of the target token.
+   * @returns Promise with the minimum rate or null.
+   */
+  async getMinRateByPair(
+    config: ContractsConfig,
+    sourceToken: string,
+    targetToken: string
+  ): Promise<string | null> {
+    return getMinRateByPair(this, config, sourceToken, targetToken);
+  }
+  
+  /**
+   * Gets the rate liquidity depths for a token pair using Carbon SDK.
+   * @param config The Carbon contracts configuration.
+   * @param sourceToken The address of the source token.
+   * @param targetToken The address of the target token.
+   * @param rates An array of rates to query.
+   * @returns Promise with the liquidity depth information or null.
+   */
+  async getRateLiquidityDepthsByPair(
+    config: ContractsConfig,
+    sourceToken: string,
+    targetToken: string,
+    rates: string[]
+  ): Promise<string | null> {
+    return getRateLiquidityDepthsByPair(this, config, sourceToken, targetToken, rates);
+  }
+  
+  /**
+   * Gets the strategies for a user using Carbon SDK.
+   * @param config The Carbon contracts configuration.
+   * @param user Optional user address. Defaults to the agent's wallet address.
+   * @returns Promise with the user's strategies or null.
+   */
+  async getUserStrategies(
+    config: ContractsConfig,
+    user?: `0x${string}`
+  ): Promise<string | null> {
+    return getUserStrategies(this, config, user);
+  }
+  
+  /**
+   * Checks if there is liquidity for a token pair using Carbon SDK.
+   * @param config The Carbon contracts configuration.
+   * @param sourceToken The address of the source token.
+   * @param targetToken The address of the target token.
+   * @returns Promise with a boolean indicating liquidity presence or null.
+   */
+  async hasLiquidityByPair(
+    config: ContractsConfig,
+    sourceToken: string,
+    targetToken: string
+  ): Promise<string | null> {
+    return hasLiquidityByPair(this, config, sourceToken, targetToken);
+  }
+  
+  /**
+   * Updates a strategy using Carbon SDK.
+   * @param config The Carbon contracts configuration.
+   * @param strategyId The ID of the strategy to update.
+   * @param update The strategy update data.
+   * @param encoded The encoded strategy data.
+   * @param buyPriceMarginal Optional marginal buy price options.
+   * @param sellPriceMarginal Optional marginal sell price options.
+   * @param overrides Optional transaction overrides.
+   * @returns Promise with the transaction hash or null.
+   */
+  async updateStrategy(
+    config: ContractsConfig,
+    strategyId: string,
+    update: StrategyUpdate,
+    encoded: EncodedStrategyBNStr,
+    buyPriceMarginal?: MarginalPriceOptions | string,
+    sellPriceMarginal?: MarginalPriceOptions | string,
+    overrides?: PayableOverrides
+  ): Promise<string | null> {
+    return updateStrategy(this, config, strategyId, update, encoded, buyPriceMarginal, sellPriceMarginal, overrides);
+  }
+  
 }

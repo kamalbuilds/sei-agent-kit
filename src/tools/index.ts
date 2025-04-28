@@ -5,4 +5,5 @@ export * from './dexscreener';
 export * from './silo';
 export * from './symphony';
 export * from './dragonswap';
+export * from './carbon';
 

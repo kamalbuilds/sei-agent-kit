@@ -14,8 +14,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@bancor/carbon-sdk": "^0.0.115-DEV",
     "@cosmjs/stargate": "^0.33.0",
-    "@langchain/langgraph": "^0.2.46",
+    "@langchain/langgraph": "^0.2.65",
     "axios": "^1.8.1",
     "chart.js": "^4.4.8",
     "dotenv": "^16.4.7",
