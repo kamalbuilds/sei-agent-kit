@@ -14,7 +14,7 @@ export async function hasLiquidityByPair(
   config: ContractsConfig,
   sourceToken: string,
   targetToken: string,
-): Promise<string | null> {
+): Promise<boolean | null> {
   try {
     const provider = new JsonRpcProvider(SEI_RPC_URL);
     const api = new ContractsApi(provider, config);
@@ -23,8 +23,7 @@ export async function hasLiquidityByPair(
 
     const result = await carbonSDK.hasLiquidityByPair(sourceToken, targetToken);
 
-    console.log(result);
-    return "";
+    return result;
   } catch (error) {
     console.error(`Error fetching token address from DexScreener: ${error instanceof Error ? error.message : String(error)}`);
     throw error;

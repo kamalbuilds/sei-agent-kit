@@ -23,7 +23,7 @@ export async function getLiquidityByPair(
 
     const liquidity = await carbonSDK.getLiquidityByPair(sourceToken, targetToken);
 
-    return "";
+    return liquidity;
   } catch (error) {
     throw error;
   }

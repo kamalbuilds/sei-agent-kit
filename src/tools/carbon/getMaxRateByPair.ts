@@ -22,7 +22,7 @@ export async function getMaxRateByPair(
     const carbonSDK = new Toolkit(api, cache, undefined);
 
     const maxRate = await carbonSDK.getMaxRateByPair(sourceToken, targetToken);
-    return "";
+    return maxRate;
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     console.error(errorMsg);

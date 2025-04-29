@@ -21,8 +21,8 @@ export async function getMinRateByPair(
     const { cache } = initSyncedCache(api.reader, undefined, MAX_BLOCK_AGE);
     const carbonSDK = new Toolkit(api, cache, undefined);
 
-    const maxRate = await carbonSDK.getMinRateByPair(sourceToken, targetToken);
-    return "";
+    const minRate = await carbonSDK.getMinRateByPair(sourceToken, targetToken);
+    return minRate;
   } catch (error) {
     throw error;
   }

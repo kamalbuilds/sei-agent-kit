@@ -15,7 +15,7 @@ export async function getRateLiquidityDepthsByPair(
   sourceToken: string,
   targetToken: string,
   rates: string[],
-): Promise<string | null> {
+): Promise<string[] | null> {
   try {
     const provider = new JsonRpcProvider(SEI_RPC_URL);
     const api = new ContractsApi(provider, config);
@@ -23,7 +23,7 @@ export async function getRateLiquidityDepthsByPair(
     const carbonSDK = new Toolkit(api, cache, undefined);
 
     const liquidityDepths = await carbonSDK.getRateLiquidityDepthsByPair(sourceToken, targetToken, rates);
-    return "";
+    return liquidityDepths;
   } catch (error) {
     throw error;
   }

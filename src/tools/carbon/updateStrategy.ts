@@ -39,8 +39,7 @@ export async function updateStrategy(
     };
 
     const txHash = await agent.walletClient.sendTransaction(viemTx);
-    console.log('Transaction sent! Hash:', txHash);
-    return "";
+    return txHash;
   } catch (error) {
     console.error(`Error fetching token address from DexScreener: ${error instanceof Error ? error.message : String(error)}`);
     throw error;

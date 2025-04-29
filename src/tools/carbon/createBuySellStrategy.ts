@@ -45,7 +45,7 @@ export async function createBuySellStrategy(
     };
 
     const txHash = await agent.walletClient.sendTransaction(viemTx);
-    return "";
+    return txHash;
   } catch (error) {
     throw error;
   }
