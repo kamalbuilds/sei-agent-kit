@@ -4,7 +4,6 @@ export * from './symphony';
 export * from './dexscreener';
 export * from './silo';
 export * from './takara';
-export * from './dragonswap';
 
 import type { SeiAgentKit } from "../agent";
 import {
@@ -22,9 +21,7 @@ import {
   SeiRepayTakaraTool,
   SeiRedeemTakaraTool,
   SeiGetRedeemableAmountTool,
-  SeiGetBorrowBalanceTool,
-  DragonSwapAddLiquidityTool,
-  DragonSwapRemoveLiquidityTool
+  SeiGetBorrowBalanceTool
 } from './index';
 
 
@@ -39,8 +36,6 @@ export function createSeiTools(seiKit: SeiAgentKit) {
     new SeiStakeTool(seiKit),
     new SeiUnstakeTool(seiKit),
     new SeiSwapTool(seiKit),
-    new DragonSwapAddLiquidityTool(seiKit),
-    new DragonSwapRemoveLiquidityTool(seiKit),
     new SeiMintTakaraTool(seiKit),
     new SeiBorrowTakaraTool(seiKit),
     new SeiRepayTakaraTool(seiKit),

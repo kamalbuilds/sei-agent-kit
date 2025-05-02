@@ -26,7 +26,6 @@ This toolkit bridges the gap between AI and blockchain interaction, enabling the
 - **Token Operations**: Complete SEI ERC-20 and ERC-721 token management
 - **DeFi Protocol Integration**: Seamless interaction with SEI's DeFi ecosystem
 - **Swap Functionality**: Token swapping through Symphony aggregator
-- **Liquidity Management**: Add and remove liquidity with DragonSwap
 - **Lending & Borrowing**: Interact with Takara protocol for lending operations
 - **Staking Operations**: Stake and unstake SEI tokens with Silo
 - **LangChain Integration**: Build AI agents with LangChain and LangGraph
@@ -37,7 +36,6 @@ The Cambrian Agent Kit integrates with a variety of protocols and services:
 
 ### DeFi Protocols
 - **Symphony**: Token swapping and routing
-- **DragonSwap**: Liquidity pool operations
 - **Takara**: Lending and borrowing platform
 - **Silo**: Staking and yield farming
 
