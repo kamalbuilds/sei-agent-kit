@@ -77,12 +77,13 @@ npm run test
 - [Twitter](https://x.com/cambrian_ai)
 - [Website](https://cambrian.wtf)
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+Check out our [Tool Creation Guide](CreateTool.md) for instructions on how to create and add new tools to the toolkit.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 ---
