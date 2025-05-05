@@ -12,7 +12,7 @@ export async function get_erc20_balance(
   agent: SeiAgentKit,
   contract_address?: Address,
 ): Promise<string> {
-  console.log(`Querying balance of ${contract_address ? contract_address : 'SEI'} for ${contract_address ? contract_address : agent.wallet_address}...`);
+  console.log(`Querying balance of ${contract_address ? contract_address : 'SEI'} for ${agent.wallet_address}...`);
   try {
     if (!contract_address) {
       // Handle native token balance
