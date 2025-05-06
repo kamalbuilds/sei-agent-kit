@@ -1,6 +1,6 @@
 {
   "name": "sei-agent-kit",
-  "version": "0.0.0",
+  "version": "0.0.3",
   "description": "A package for building AI agents on the SEI blockchain",
   "main": "dist/index.js",
   "scripts": {
@@ -9,13 +9,14 @@
   "keywords": [
     "sei",
     "sei-agent-kit",
-    "ai"
+    "sei ai"
   ],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@cosmjs/stargate": "^0.33.0",
     "@langchain/langgraph": "^0.2.46",
+    "@langchain/openai": "^0.5.10",
     "axios": "^1.8.1",
     "chart.js": "^4.4.8",
     "dotenv": "^16.4.7",

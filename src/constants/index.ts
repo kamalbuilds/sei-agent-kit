@@ -1,4 +1,4 @@
-import { IToken } from "../interfaces";
+import { IToken } from "../types";
 
 export const SEI_RPC_URL = "https://evm-rpc.sei-apis.com/";
 export const MAX_BLOCK_AGE = 2000; // past this many blocks, the SDK won't attempt to catch up by processing events and instead call the contracts for strategy info.

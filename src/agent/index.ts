@@ -10,7 +10,6 @@ import {
 import { sei } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
 import { get_erc20_balance, erc20_transfer, get_erc721_balance, erc721Transfer, erc721Mint, stakeSei, unstakeSei, getTokenAddressFromTicker} from '../tools';
-import { Config } from '../interfaces';
 import {
   mintTakara,
   borrowTakara,
@@ -22,21 +21,21 @@ import {
   getTakaraTTokenAddress
 } from '../tools/takara';
 import { swap } from '../tools/symphony/swap';
-
+import { getTokenForProvider } from './modelProvider';
+import { ModelProviderName } from '../types';
 export class SeiAgentKit {
   public publicClient: ViemPublicClient;
   public walletClient: ViemWalletClient;
   public wallet_address: Address;
-  public config: Config;
-
+  public token: string | undefined;
   /**
    * Creates a new SeiAgentKit instance
    * @param private_key The private key for the wallet
-   * @param configOrKey The configuration object or OpenAI API key
+   * @param provider The model provider to use
    */
   constructor(
     private_key: string,
-    configOrKey: Config | string | null,
+    provider: ModelProviderName,
   ) {
     const account = privateKeyToAccount(private_key as Address);
     this.publicClient = createPublicClient({
@@ -49,13 +48,8 @@ export class SeiAgentKit {
       chain: sei,
       transport: http()
     });
-
-    // Handle both old and new patterns
-    if (typeof configOrKey === "string" || configOrKey === null) {
-      this.config = { OPENAI_API_KEY: configOrKey || "" };
-    } else {
-      this.config = configOrKey;
-    }
+    
+    this.token = getTokenForProvider(provider);
   }
 
   /**
