@@ -9,7 +9,7 @@ import {
 } from "viem";
 import { sei } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
-import { get_erc20_balance, erc20_transfer, get_erc721_balance, erc721Transfer, erc721Mint, stakeSei, unstakeSei, getTokenAddressFromTicker} from '../tools';
+import { get_erc20_balance, erc20_transfer, get_erc721_balance, erc721Transfer, erc721Mint, stakeSei, unstakeSei, getTokenAddressFromTicker, citrexDeposit, citrexWithdraw } from '../tools';
 import {
   mintTakara,
   borrowTakara,
@@ -225,5 +225,24 @@ export class SeiAgentKit {
       throw new Error(`No Takara tToken found for ticker: ${ticker}`);
     }
     return getBorrowBalance(this, tTokenAddress, userAddress);
+  }
+
+  // Citrex Protocol methods
+  /**
+   * Deposits USDC tokens into the Citrex Protocol
+   * @param amount The amount of USDC to deposit as a string (e.g., "1.5" for 1.5 USDC)
+   * @returns Promise with transaction hash or error message
+   */
+  async citrexDeposit(amount: string) {
+    return citrexDeposit(amount);
+  }
+
+  /**
+   * Withdraws USDC tokens from the Citrex Protocol
+   * @param amount The amount of USDC to withdraw as a string (e.g., "1.5" for 1.5 USDC)
+   * @returns Promise with transaction hash or error message
+   */
+  async citrexWithdraw(amount: string) {
+    return citrexWithdraw(amount);
   }
 }

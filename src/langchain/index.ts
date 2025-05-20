@@ -4,6 +4,7 @@ export * from './symphony';
 export * from './dexscreener';
 export * from './silo';
 export * from './takara';
+export * from './citrex';
 
 import type { SeiAgentKit } from "../agent";
 import {
@@ -21,7 +22,9 @@ import {
   SeiRepayTakaraTool,
   SeiRedeemTakaraTool,
   SeiGetRedeemableAmountTool,
-  SeiGetBorrowBalanceTool
+  SeiGetBorrowBalanceTool,
+  SeiCitrexDepositTool,
+  SeiCitrexWithdrawTool,
 } from './index';
 
 
@@ -42,5 +45,7 @@ export function createSeiTools(seiKit: SeiAgentKit) {
     new SeiRedeemTakaraTool(seiKit),
     new SeiGetRedeemableAmountTool(seiKit),
     new SeiGetBorrowBalanceTool(seiKit),
+    new SeiCitrexDepositTool(seiKit),
+    new SeiCitrexWithdrawTool(seiKit),
   ];
 }
