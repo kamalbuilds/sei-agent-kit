@@ -1,2 +1,6 @@
 export * from './deposit'
 export * from './withdraw'
+export * from './getProducts'
+export * from './getOrderBook'
+export * from './getAccountHealth'
+export * from './getTickers'

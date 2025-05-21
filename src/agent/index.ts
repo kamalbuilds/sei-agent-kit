@@ -9,7 +9,7 @@ import {
 } from "viem";
 import { sei } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
-import { get_erc20_balance, erc20_transfer, get_erc721_balance, erc721Transfer, erc721Mint, stakeSei, unstakeSei, getTokenAddressFromTicker, citrexDeposit, citrexWithdraw } from '../tools';
+import { get_erc20_balance, erc20_transfer, get_erc721_balance, erc721Transfer, erc721Mint, stakeSei, unstakeSei, getTokenAddressFromTicker, citrexDeposit, citrexWithdraw, citrexGetProducts, citrexGetOrderBook, citrexGetAccountHealth, citrexGetTickers } from '../tools';
 import {
   mintTakara,
   borrowTakara,
@@ -244,5 +244,42 @@ export class SeiAgentKit {
    */
   async citrexWithdraw(amount: string) {
     return citrexWithdraw(amount);
+  }
+
+  /**
+   * Retrieves all products from the Citrex Protocol
+   * @returns Promise with products or error message
+   */
+  async citrexGetProducts() {
+    return citrexGetProducts();
+  }
+
+  /**
+   * Retrieves the order book for a product from the Citrex Protocol
+   * @param symbol The symbol of the product (e.g., "ethperp")
+   * @returns Promise with order book or error message
+   */
+  async citrexGetOrderBook(symbol: string) {
+    return citrexGetOrderBook(symbol);
+  }
+
+  /**
+   * Retrieves the account health for the Citrex Protocol
+   * @returns Promise with account health or error message
+   */
+  async citrexGetAccountHealth() {
+    return citrexGetAccountHealth();
+  }
+
+  /**
+   * Retrieves the tickers for the Citrex Protocol
+   * @returns Promise with tickers or error message
+   */
+  async citrexGetTickers(symbol?: `${string}perp`) {
+    if (symbol) {
+      return citrexGetTickers(symbol);
+    } else {
+      return citrexGetTickers();
+    }
   }
 }

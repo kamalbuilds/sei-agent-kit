@@ -25,6 +25,10 @@ import {
   SeiGetBorrowBalanceTool,
   SeiCitrexDepositTool,
   SeiCitrexWithdrawTool,
+  SeiCitrexGetProductsTool,
+  SeiCitrexGetOrderBookTool,
+  SeiCitrexGetAccountHealthTool,
+  SeiCitrexGetTickersTool,
 } from './index';
 
 
@@ -47,5 +51,9 @@ export function createSeiTools(seiKit: SeiAgentKit) {
     new SeiGetBorrowBalanceTool(seiKit),
     new SeiCitrexDepositTool(seiKit),
     new SeiCitrexWithdrawTool(seiKit),
+    new SeiCitrexGetProductsTool(seiKit),
+    new SeiCitrexGetOrderBookTool(seiKit),
+    new SeiCitrexGetAccountHealthTool(seiKit),
+    new SeiCitrexGetTickersTool(seiKit),
   ];
 }
