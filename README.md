@@ -28,6 +28,7 @@ This toolkit bridges the gap between AI and blockchain interaction, enabling the
 - **Swap Functionality**: Token swapping through Symphony aggregator
 - **Lending & Borrowing**: Interact with Takara protocol for lending operations
 - **Staking Operations**: Stake and unstake SEI tokens with Silo
+- **Perpetual Trading**: Trade perpetual contracts on Citrex protocol
 - **LangChain Integration**: Build AI agents with LangChain and LangGraph
 
 ## 📋 Supported Protocols
@@ -38,6 +39,7 @@ The Cambrian Agent Kit integrates with a variety of protocols and services:
 - **Symphony**: Token swapping and routing
 - **Takara**: Lending and borrowing platform
 - **Silo**: Staking and yield farming
+- **Citrex**: Perpetual trading platform
 
 ### Token Standards
 - **SEI ERC-20**: Complete token operations
