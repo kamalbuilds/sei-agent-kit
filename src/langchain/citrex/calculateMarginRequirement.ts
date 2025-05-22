@@ -12,7 +12,7 @@ const CitrexCalculateMarginRequirementInputSchema = z.object({
 
 export class SeiCitrexCalculateMarginRequirementTool extends StructuredTool<typeof CitrexCalculateMarginRequirementInputSchema> {
     name = "citrex_calculate_margin_requirement";
-    description = "Calculate the required margin for a new order on the Citrex Protocol. This helps determine how much collateral is needed for a trade.";
+    description = "Calculate the required margin for a new order on the Citrex Protocol. This helps determine how much collateral is needed for a trade. Returns the required margin amount as a bigint value.";
     schema = CitrexCalculateMarginRequirementInputSchema;
 
     constructor(private readonly seiKit: SeiAgentKit) {

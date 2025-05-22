@@ -13,7 +13,7 @@ const CitrexGetKlinesInputSchema = z.object({
 
 export class SeiCitrexGetKlinesTool extends StructuredTool<typeof CitrexGetKlinesInputSchema> {
     name = "citrex_get_klines";
-    description = "Get K-line (candlestick) chart data for a product on the Citrex Protocol. This provides historical price data for technical analysis.";
+    description = "Get K-line (candlestick) chart data for a product on the Citrex Protocol. This provides historical price data for technical analysis. Returns an array of K-lines containing open, close, high, low prices, volume, timestamp, symbol, interval information, and whether the candle is closed.";
     schema = CitrexGetKlinesInputSchema;
 
     constructor(private readonly seiKit: SeiAgentKit) {

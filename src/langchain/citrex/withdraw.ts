@@ -8,7 +8,7 @@ const CitrexWithdrawInputSchema = z.object({
 
 export class SeiCitrexWithdrawTool extends StructuredTool<typeof CitrexWithdrawInputSchema> {
   name = "citrex_withdraw";
-  description = "Withdraws USDC tokens from the Citrex Protocol";
+  description = "Withdraws USDC tokens from the Citrex Protocol. Returns a success flag and transaction hash if the withdrawal was successful.";
   schema = CitrexWithdrawInputSchema;
 
   constructor(private readonly seiKit: SeiAgentKit) {

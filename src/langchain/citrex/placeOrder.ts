@@ -20,7 +20,7 @@ const CitrexPlaceOrderInputSchema = z.object({
 
 export class SeiCitrexPlaceOrderTool extends StructuredTool<typeof CitrexPlaceOrderInputSchema> {
     name = "citrex_place_order";
-    description = "Places an order on the Citrex Protocol. You can place limit or market orders to buy or sell assets.";
+    description = "Places an order on the Citrex Protocol. You can place limit or market orders to buy or sell assets. Returns the created order with details including order ID, account address, product information, price, quantity, order type, time in force, buy/sell direction, creation time, expiry, and status.";
     schema = CitrexPlaceOrderInputSchema;
 
     constructor(private readonly seiKit: SeiAgentKit) {

@@ -12,7 +12,7 @@ const CitrexGetProductInputSchema = z.object({
 
 export class SeiCitrexGetProductTool extends StructuredTool<typeof CitrexGetProductInputSchema> {
     name = "citrex_get_product";
-    description = "Retrieves information about a specific product on the Citrex Protocol using either its ID or symbol. You can get information about trading pairs, price precision, etc.";
+    description = "Retrieves information about a specific product on the Citrex Protocol using either its ID or symbol. Returns detailed product information including ID, symbol, base/quote assets, fees, price increment, min/max quantities, weights, mark price, and active status.";
     schema = CitrexGetProductInputSchema;
 
     constructor(private readonly seiKit: SeiAgentKit) {

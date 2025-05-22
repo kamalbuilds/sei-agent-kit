@@ -4,7 +4,7 @@ import { ServerTimeReturnType } from "../../../node_modules/citrex-sdk/lib/types
 
 export class SeiCitrexGetServerTimeTool extends Tool {
     name = "citrex_get_server_time";
-    description = "Retrieves the current server time from the Citrex Protocol";
+    description = "Retrieves the current server time from the Citrex Protocol. Returns the server time as a Unix timestamp in milliseconds.";
     constructor(private readonly seiKit: SeiAgentKit) {
         super();
     }

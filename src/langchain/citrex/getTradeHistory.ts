@@ -10,7 +10,7 @@ const CitrexGetTradeHistoryInputSchema = z.object({
 
 export class SeiCitrexGetTradeHistoryTool extends StructuredTool<typeof CitrexGetTradeHistoryInputSchema> {
     name = "citrex_get_trade_history";
-    description = "Retrieves trade history for a product on the Citrex Protocol. This shows recent trades that have occurred for a specific trading pair.";
+    description = "Retrieves trade history for a product on the Citrex Protocol. This shows recent trades that have occurred for a specific trading pair. Returns an array of trades with details including timestamp, maker/taker information, price, quantity, fees, trade direction, and unique identifiers.";
     schema = CitrexGetTradeHistoryInputSchema;
 
     constructor(private readonly seiKit: SeiAgentKit) {

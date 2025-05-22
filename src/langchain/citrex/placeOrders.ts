@@ -25,7 +25,7 @@ const CitrexPlaceOrdersInputSchema = z.object({
 
 export class SeiCitrexPlaceOrdersTool extends StructuredTool<typeof CitrexPlaceOrdersInputSchema> {
     name = "citrex_place_orders";
-    description = "Places multiple orders on the Citrex Protocol in a single operation. This is more efficient than placing orders one by one.";
+    description = "Places multiple orders on the Citrex Protocol in a single operation. This is more efficient than placing orders one by one. Returns an array of created orders, each with details including order ID, account address, product information, price, quantity, order type, time in force, buy/sell direction, creation time, expiry, and status.";
     schema = CitrexPlaceOrdersInputSchema;
 
     constructor(private readonly seiKit: SeiAgentKit) {

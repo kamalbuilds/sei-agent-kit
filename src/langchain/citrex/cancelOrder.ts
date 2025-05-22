@@ -10,7 +10,7 @@ const CitrexCancelOrderInputSchema = z.object({
 
 export class SeiCitrexCancelOrderTool extends StructuredTool<typeof CitrexCancelOrderInputSchema> {
     name = "citrex_cancel_order";
-    description = "Cancels a specific order on the Citrex Protocol. You need both the order ID and the product ID to cancel an order.";
+    description = "Cancels a specific order on the Citrex Protocol. You need both the order ID and the product ID to cancel an order. Returns a success flag indicating whether the cancellation was successful.";
     schema = CitrexCancelOrderInputSchema;
 
     constructor(private readonly seiKit: SeiAgentKit) {

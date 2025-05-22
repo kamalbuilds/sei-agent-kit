@@ -8,7 +8,7 @@ const CitrexDepositInputSchema = z.object({
 
 export class SeiCitrexDepositTool extends StructuredTool<typeof CitrexDepositInputSchema> {
   name = "citrex_deposit";
-  description = "Deposits USDC tokens into the Citrex Protocol";
+  description = "Deposits USDC tokens into the Citrex Protocol. Returns a success flag and transaction hash if the deposit was successful.";
   schema = CitrexDepositInputSchema;
 
   constructor(private readonly seiKit: SeiAgentKit) {

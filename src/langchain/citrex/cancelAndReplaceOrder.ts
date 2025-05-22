@@ -15,7 +15,7 @@ const CitrexCancelAndReplaceOrderInputSchema = z.object({
 
 export class SeiCitrexCancelAndReplaceOrderTool extends StructuredTool<typeof CitrexCancelAndReplaceOrderInputSchema> {
     name = "citrex_cancel_and_replace_order";
-    description = "Cancels and replaces an order on the Citrex Protocol. This is useful for updating an existing order without having to cancel it first and then place a new one.";
+    description = "Cancels and replaces an order on the Citrex Protocol. This is useful for updating an existing order without having to cancel it first and then place a new one. Returns the newly created order with details including order ID, account address, product information, price, quantity, order type, time in force, buy/sell direction, creation time, expiry, and status.";
     schema = CitrexCancelAndReplaceOrderInputSchema;
 
     constructor(private readonly seiKit: SeiAgentKit) {

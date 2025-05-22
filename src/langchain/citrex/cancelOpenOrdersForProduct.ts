@@ -9,7 +9,7 @@ const CitrexCancelOpenOrdersForProductInputSchema = z.object({
 
 export class SeiCitrexCancelOpenOrdersForProductTool extends StructuredTool<typeof CitrexCancelOpenOrdersForProductInputSchema> {
     name = "citrex_cancel_open_orders_for_product";
-    description = "Cancels all open orders for a specific product on the Citrex Protocol. This is useful for quickly closing all positions for a particular trading pair.";
+    description = "Cancels all open orders for a specific product on the Citrex Protocol. This is useful for quickly closing all positions for a particular trading pair. Returns a success flag indicating whether the operation was successful.";
     schema = CitrexCancelOpenOrdersForProductInputSchema;
 
     constructor(private readonly seiKit: SeiAgentKit) {

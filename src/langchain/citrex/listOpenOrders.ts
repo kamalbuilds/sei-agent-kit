@@ -9,7 +9,7 @@ const CitrexListOpenOrdersInputSchema = z.object({
 
 export class SeiCitrexListOpenOrdersTool extends StructuredTool<typeof CitrexListOpenOrdersInputSchema> {
     name = "citrex_list_open_orders";
-    description = "Lists all open orders for the account and sub-account on the Citrex Protocol. Can be filtered by product symbol.";
+    description = "Lists all open orders for the account and sub-account on the Citrex Protocol. Can be filtered by product symbol. Returns an array of orders with details including order ID, account address, product information, price, quantity, residual quantity, order type, time in force, buy/sell direction, creation time, expiry, and status.";
     schema = CitrexListOpenOrdersInputSchema;
 
     constructor(private readonly seiKit: SeiAgentKit) {
@@ -20,4 +20,4 @@ export class SeiCitrexListOpenOrdersTool extends StructuredTool<typeof CitrexLis
         const { productSymbol } = input;
         return this.seiKit.citrexListOpenOrders(productSymbol as `${string}perp` | undefined);
     }
-} 
+}
