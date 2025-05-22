@@ -9,7 +9,7 @@ import {
 } from "viem";
 import { sei } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
-import { get_erc20_balance, erc20_transfer, get_erc721_balance, erc721Transfer, erc721Mint, stakeSei, unstakeSei, getTokenAddressFromTicker} from '../tools';
+import { get_erc20_balance, erc20_transfer, get_erc721_balance, erc721Transfer, erc721Mint, stakeSei, unstakeSei, getTokenAddressFromTicker, postTweet, TwitterPostTweetSchema, getAccountDetails, getAccountMentions, TwitterAccountMentionsSchema, postTweetReply, TwitterPostTweetReplySchema } from '../tools';
 import {
   mintTakara,
   borrowTakara,
@@ -23,6 +23,8 @@ import {
 import { swap } from '../tools/symphony/swap';
 import { getTokenForProvider } from './modelProvider';
 import { ModelProviderName } from '../types';
+import { z } from 'zod';
+
 export class SeiAgentKit {
   public publicClient: ViemPublicClient;
   public walletClient: ViemWalletClient;
@@ -225,5 +227,39 @@ export class SeiAgentKit {
       throw new Error(`No Takara tToken found for ticker: ${ticker}`);
     }
     return getBorrowBalance(this, tTokenAddress, userAddress);
+  }
+
+  /**
+   * Posts a tweet to Twitter
+   * @param tweet The tweet to post
+   * @returns Transaction hash and tweet details
+   */
+  async postTweet(tweet: z.infer<typeof TwitterPostTweetSchema>) {
+    return postTweet(tweet);
+  }
+
+  /**
+   * Retrieves details about the authenticated user's Twitter account
+   * @returns Account details as a string
+   */
+  async getAccountDetails() {
+    return getAccountDetails();
+  }
+
+  /**
+   * Retrieves mentions for the authenticated user's Twitter account
+   * @returns Mentions as a string
+   */
+  async getAccountMentions(args: z.infer<typeof TwitterAccountMentionsSchema>) {
+    return getAccountMentions(args);
+  }
+
+  /**
+   * Posts a reply to a tweet on Twitter
+   * @param args The arguments for posting a reply
+   * @returns Transaction hash and reply details
+   */
+  async postTweetReply(args: z.infer<typeof TwitterPostTweetReplySchema>) {
+    return postTweetReply(args);
   }
 }

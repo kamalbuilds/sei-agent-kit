@@ -4,7 +4,7 @@ export * from './symphony';
 export * from './dexscreener';
 export * from './silo';
 export * from './takara';
-
+export * from './twitter';
 import type { SeiAgentKit } from "../agent";
 import {
   SeiERC20BalanceTool,
@@ -21,7 +21,11 @@ import {
   SeiRepayTakaraTool,
   SeiRedeemTakaraTool,
   SeiGetRedeemableAmountTool,
-  SeiGetBorrowBalanceTool
+  SeiGetBorrowBalanceTool,
+  SeiPostTweetTool,
+  SeiGetAccountDetailsTool,
+  SeiGetAccountMentionsTool,
+  SeiPostTweetReplyTool,
 } from './index';
 
 
@@ -42,5 +46,10 @@ export function createSeiTools(seiKit: SeiAgentKit) {
     new SeiRedeemTakaraTool(seiKit),
     new SeiGetRedeemableAmountTool(seiKit),
     new SeiGetBorrowBalanceTool(seiKit),
+    new SeiPostTweetTool(seiKit),
+    new SeiGetAccountDetailsTool(seiKit),
+    new SeiGetAccountMentionsTool(seiKit),
+    new SeiPostTweetReplyTool(seiKit),
   ];
 }
+     
