@@ -9,7 +9,7 @@ import {
 } from "viem";
 import { sei } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
-import { get_erc20_balance, erc20_transfer, get_erc721_balance, erc721Transfer, erc721Mint, stakeSei, unstakeSei, getTokenAddressFromTicker, postTweet, TwitterPostTweetSchema, getAccountDetails, getAccountMentions, TwitterAccountMentionsSchema, postTweetReply, TwitterPostTweetReplySchema } from '../tools';
+import { get_erc20_balance, erc20_transfer, get_erc721_balance, erc721Transfer, erc721Mint, stakeSei, unstakeSei, getTokenAddressFromTicker, postTweet, TwitterPostTweetSchema, getAccountDetails, getAccountMentions, TwitterAccountMentionsSchema, postTweetReply, TwitterPostTweetReplySchema , citrexDeposit, citrexWithdraw, citrexGetProducts, citrexGetOrderBook, citrexGetAccountHealth, citrexGetTickers, citrexCalculateMarginRequirement, citrexGetKlines, citrexGetProduct, citrexGetServerTime, citrexGetTradeHistory, citrexCancelAndReplaceOrder, citrexCancelOpenOrdersForProduct, citrexCancelOrder, citrexCancelOrders, citrexListBalances, citrexListOpenOrders, citrexListPositions, citrexPlaceOrder, citrexPlaceOrders } from '../tools';
 import {
   mintTakara,
   borrowTakara,
@@ -50,7 +50,7 @@ export class SeiAgentKit {
       chain: sei,
       transport: http()
     });
-    
+
     this.token = getTokenForProvider(provider);
   }
 
@@ -261,5 +261,192 @@ export class SeiAgentKit {
    */
   async postTweetReply(args: z.infer<typeof TwitterPostTweetReplySchema>) {
     return postTweetReply(args);
+  }
+
+  // Citrex Protocol methods
+  /**
+   * Deposits USDC tokens into the Citrex Protocol
+   * @param amount The amount of USDC to deposit as a string (e.g., "1.5" for 1.5 USDC)
+   * @returns Promise with transaction hash or error message
+   */
+  async citrexDeposit(amount: string) {
+    return citrexDeposit(amount);
+  }
+
+  /**
+   * Withdraws USDC tokens from the Citrex Protocol
+   * @param amount The amount of USDC to withdraw as a string (e.g., "1.5" for 1.5 USDC)
+   * @returns Promise with transaction hash or error message
+   */
+  async citrexWithdraw(amount: string) {
+    return citrexWithdraw(amount);
+  }
+
+  /**
+   * Retrieves all products from the Citrex Protocol
+   * @returns Promise with products or error message
+   */
+  async citrexGetProducts() {
+    return citrexGetProducts();
+  }
+
+  /**
+   * Retrieves the order book for a product from the Citrex Protocol
+   * @param symbol The symbol of the product (e.g., "ethperp")
+   * @returns Promise with order book or error message
+   */
+  async citrexGetOrderBook(symbol: string) {
+    return citrexGetOrderBook(symbol);
+  }
+
+  /**
+   * Retrieves the account health for the Citrex Protocol
+   * @returns Promise with account health or error message
+   */
+  async citrexGetAccountHealth() {
+    return citrexGetAccountHealth();
+  }
+
+  /**
+   * Retrieves the tickers for the Citrex Protocol
+   * @returns Promise with tickers or error message
+   */
+  async citrexGetTickers(symbol?: `${string}perp`) {
+    if (symbol) {
+      return citrexGetTickers(symbol);
+    } else {
+      return citrexGetTickers();
+    }
+  }
+
+  /**
+   * Calculates the required margin for a new order on Citrex Protocol
+   * @param isBuy Whether to buy (true) or sell (false)
+   * @param price The price of the asset for the order
+   * @param productId The product ID of the asset
+   * @param quantity The quantity of the asset to order
+   * @returns Promise with the required margin calculation result
+   */
+  async citrexCalculateMarginRequirement(isBuy: boolean, price: number, productId: number, quantity: number) {
+    return citrexCalculateMarginRequirement(isBuy, price, productId, quantity);
+  }
+
+  /**
+   * Retrieves K-line (candlestick) chart data for a product on Citrex Protocol
+   * @param productSymbol The product symbol (e.g., 'btcperp', 'ethperp')
+   * @param optionalArgs Optional arguments for the query
+   * @returns Promise with K-line data
+   */
+  async citrexGetKlines(productSymbol: `${string}perp`, optionalArgs?: any) {
+    return citrexGetKlines(productSymbol, optionalArgs);
+  }
+
+  /**
+   * Retrieves information about a specific product on Citrex Protocol
+   * @param identifier The product ID or symbol
+   * @returns Promise with product information
+   */
+  async citrexGetProduct(identifier: number | string) {
+    return citrexGetProduct(identifier);
+  }
+
+  /**
+   * Retrieves the current server time from Citrex Protocol
+   * @returns Promise with server time information
+   */
+  async citrexGetServerTime() {
+    return citrexGetServerTime();
+  }
+
+  /**
+   * Retrieves trade history for a product on Citrex Protocol
+   * @param productSymbol The product symbol (e.g., 'btcperp', 'ethperp')
+   * @param quantity Optional number of trades to fetch
+   * @returns Promise with trade history data
+   */
+  async citrexGetTradeHistory(productSymbol: `${string}perp`, quantity?: number) {
+    return citrexGetTradeHistory(productSymbol, quantity);
+  }
+
+  /**
+   * Cancels and replaces an order on Citrex Protocol
+   * @param orderId The unique ID of the order to replace
+   * @param orderArgs The new order arguments
+   * @returns Promise with the new order information
+   */
+  async citrexCancelAndReplaceOrder(orderId: `0x${string}`, orderArgs: any) {
+    return citrexCancelAndReplaceOrder(orderId, orderArgs);
+  }
+
+  /**
+   * Cancels all open orders for a specific product on Citrex Protocol
+   * @param productId The product ID to cancel orders for
+   * @returns Promise with cancellation status
+   */
+  async citrexCancelOpenOrdersForProduct(productId: number) {
+    return citrexCancelOpenOrdersForProduct(productId);
+  }
+
+  /**
+   * Cancels a specific order on Citrex Protocol
+   * @param orderId The unique ID of the order to cancel
+   * @param productId The product ID of the order
+   * @returns Promise with cancellation status
+   */
+  async citrexCancelOrder(orderId: `0x${string}`, productId: number) {
+    return citrexCancelOrder(orderId, productId);
+  }
+
+  /**
+   * Cancels multiple orders on Citrex Protocol
+   * @param ordersArgs Array of [orderId, productId] pairs to cancel
+   * @returns Promise with array of cancellation statuses
+   */
+  async citrexCancelOrders(ordersArgs: [`0x${string}`, number][]) {
+    return citrexCancelOrders(ordersArgs);
+  }
+
+  /**
+   * Lists all margin balances for the account on Citrex Protocol
+   * @returns Promise with balance information
+   */
+  async citrexListBalances() {
+    return citrexListBalances();
+  }
+
+  /**
+   * Lists all open orders for the account on Citrex Protocol
+   * @param productSymbol Optional product symbol to filter by
+   * @returns Promise with open orders information
+   */
+  async citrexListOpenOrders(productSymbol?: `${string}perp`) {
+    return citrexListOpenOrders(productSymbol);
+  }
+
+  /**
+   * Lists all positions for the account on Citrex Protocol
+   * @param productSymbol Optional product symbol to filter by
+   * @returns Promise with positions information
+   */
+  async citrexListPositions(productSymbol?: `${string}perp`) {
+    return citrexListPositions(productSymbol);
+  }
+
+  /**
+   * Places an order on Citrex Protocol
+   * @param orderArgs The order arguments
+   * @returns Promise with order information
+   */
+  async citrexPlaceOrder(orderArgs: any) {
+    return citrexPlaceOrder(orderArgs);
+  }
+
+  /**
+   * Places multiple orders on Citrex Protocol
+   * @param ordersArgs Array of order arguments
+   * @returns Promise with array of order information
+   */
+  async citrexPlaceOrders(ordersArgs: any[]) {
+    return citrexPlaceOrders(ordersArgs);
   }
 }

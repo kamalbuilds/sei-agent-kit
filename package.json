@@ -4,7 +4,8 @@
   "description": "A package for building AI agents on the SEI blockchain",
   "main": "dist/index.js",
   "scripts": {
-    "test": "tsx test/index.ts"
+    "test": "tsx test/index.ts",
+    "citrex": "tsx test/citrex-test.ts"
   },
   "keywords": [
     "sei",
@@ -19,6 +20,7 @@
     "@langchain/openai": "^0.5.10",
     "axios": "^1.8.1",
     "chart.js": "^4.4.8",
+    "citrex-sdk": "^1.2.2",
     "dotenv": "^16.4.7",
     "ethers": "5.7.2",
     "langchain": "^0.3.19",

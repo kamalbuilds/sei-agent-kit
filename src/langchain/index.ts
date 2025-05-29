@@ -5,6 +5,8 @@ export * from './dexscreener';
 export * from './silo';
 export * from './takara';
 export * from './twitter';
+export * from './citrex';
+
 import type { SeiAgentKit } from "../agent";
 import {
   SeiERC20BalanceTool,
@@ -22,6 +24,26 @@ import {
   SeiRedeemTakaraTool,
   SeiGetRedeemableAmountTool,
   SeiGetBorrowBalanceTool,
+  SeiCitrexDepositTool,
+  SeiCitrexWithdrawTool,
+  SeiCitrexGetProductsTool,
+  SeiCitrexGetOrderBookTool,
+  SeiCitrexGetAccountHealthTool,
+  SeiCitrexGetTickersTool,
+  SeiCitrexCalculateMarginRequirementTool,
+  SeiCitrexGetKlinesTool,
+  SeiCitrexGetProductTool,
+  SeiCitrexGetServerTimeTool,
+  SeiCitrexGetTradeHistoryTool,
+  SeiCitrexCancelAndReplaceOrderTool,
+  SeiCitrexCancelOpenOrdersForProductTool,
+  SeiCitrexCancelOrderTool,
+  SeiCitrexCancelOrdersTool,
+  SeiCitrexListBalancesTool,
+  SeiCitrexListOpenOrdersTool,
+  SeiCitrexListPositionsTool,
+  SeiCitrexPlaceOrderTool,
+  SeiCitrexPlaceOrdersTool,
   SeiPostTweetTool,
   SeiGetAccountDetailsTool,
   SeiGetAccountMentionsTool,
@@ -50,6 +72,26 @@ export function createSeiTools(seiKit: SeiAgentKit) {
     new SeiGetAccountDetailsTool(seiKit),
     new SeiGetAccountMentionsTool(seiKit),
     new SeiPostTweetReplyTool(seiKit),
+    new SeiCitrexDepositTool(seiKit),
+    new SeiCitrexWithdrawTool(seiKit),
+    new SeiCitrexGetProductsTool(seiKit),
+    new SeiCitrexGetOrderBookTool(seiKit),
+    new SeiCitrexGetAccountHealthTool(seiKit),
+    new SeiCitrexGetTickersTool(seiKit),
+    new SeiCitrexCalculateMarginRequirementTool(seiKit),
+    new SeiCitrexGetKlinesTool(seiKit),
+    new SeiCitrexGetProductTool(seiKit),
+    new SeiCitrexGetServerTimeTool(seiKit),
+    new SeiCitrexGetTradeHistoryTool(seiKit),
+    new SeiCitrexCancelAndReplaceOrderTool(seiKit),
+    new SeiCitrexCancelOpenOrdersForProductTool(seiKit),
+    new SeiCitrexCancelOrderTool(seiKit),
+    new SeiCitrexCancelOrdersTool(seiKit),
+    new SeiCitrexListBalancesTool(seiKit),
+    new SeiCitrexListOpenOrdersTool(seiKit),
+    new SeiCitrexListPositionsTool(seiKit),
+    new SeiCitrexPlaceOrderTool(seiKit),
+    new SeiCitrexPlaceOrdersTool(seiKit),
   ];
 }
      
