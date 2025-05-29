@@ -12,7 +12,7 @@ export async function citrexGetAccountHealth(): Promise<AccountHealthReturnType 
             debug: false,
             environment: 'mainnet',
             rpc: 'https://evm-rpc.sei-apis.com',
-            subAccountId: 1,
+            subAccountId: 0,
         }
         const Client = new CitrexSDK(MY_PRIVATE_KEY as `0x${string}`, CONFIG as Config)
         const returnAccountHealth = await Client.getAccountHealth()

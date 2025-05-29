@@ -1,4 +1,4 @@
-import { parseUnits } from 'viem';
+import { parseUnits, formatUnits } from 'viem';
 
 export function formatSei(amount: string | number, decimals: number): bigint {
   const amountStr = typeof amount === 'number' ? amount.toString() : amount;
@@ -6,5 +6,5 @@ export function formatSei(amount: string | number, decimals: number): bigint {
 }
 
 export function formatWei(amount: number, decimals: number): number {
-  return amount / 10 ** decimals;
+  return Number(formatUnits(BigInt(amount), decimals));
 }
