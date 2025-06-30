@@ -10,6 +10,7 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { SeiAgentKit } from "../../index";
 import { SEI_RPC_URL, MAX_BLOCK_AGE } from "../../constants";
 import { type StrategyType, getStrategyTypeParams } from "./utils";
+import { Address } from "viem";
 
 /**
  
@@ -18,8 +19,8 @@ export async function createBuySellStrategy(
   agent: SeiAgentKit,
   config: ContractsConfig,
   type: StrategyType,
-  baseToken: string,
-  quoteToken: string,
+  baseToken: Address,
+  quoteToken: Address,
   buyRange: string | string[] | undefined,
   sellRange: string | string[] | undefined,
   buyBudget: string | undefined,
@@ -49,6 +50,21 @@ export async function createBuySellStrategy(
     buyRange,
     sellRange,
   );
+
+  console.log(`
+    Creating Buy/Sell Strategy
+    
+    baseToken is ${baseToken}
+    quoteToken is ${quoteToken}
+    buyBudget is ${parsedBuyBudget}
+    buyPriceLow is ${buyPriceLow}
+    buyPriceMarginal is ${buyPriceMarginal}
+    buyPriceHigh is ${buyPriceHigh}
+    sellBudget is ${parsedSellBudget}
+    sellPriceLow is ${sellPriceLow}
+    sellPriceMarginal is ${sellPriceMarginal}
+    sellPriceHigh is ${sellPriceHigh}
+    `);
 
   const populatedTx = await carbonSDK.createBuySellStrategy(
     baseToken,

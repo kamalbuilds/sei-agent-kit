@@ -3,15 +3,16 @@ import {
   calculateOverlappingPrices,
   Toolkit,
 } from "@bancor/carbon-sdk/strategy-management";
-import { BigNumber } from "ethers";
+import { SeiAgentKit } from "../../agent";
+import { Address } from "viem";
+import { getTokenDecimals } from "../../utils";
+import { Decimal } from "@bancor/carbon-sdk/utils";
+
+const CARBON_NATIVE_SEI_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
 // Disposable/recurring defaults
 const DEFAULT_SPREAD_INNER = 0.01; // %
 const DEFAULT_SPREAD_OUTER = 0.05; // %
-
-// Overlapping defaults
-const DEFAULT_FEE = 1; // %
-const DEFAULT_RANGE = 10; // % from market price
 
 export const carbonConfig: ContractsConfig = {
   carbonControllerAddress: "0xe4816658ad10bF215053C533cceAe3f59e1f1087",
@@ -22,7 +23,7 @@ export const carbonConfig: ContractsConfig = {
 
 export type StrategyType = "disposable" | "recurring";
 
-async function fetchTokenPrice(tokenAddress: string): Promise<BigNumber> {
+async function fetchTokenPrice(tokenAddress: string): Promise<Decimal> {
   try {
     const response = await fetch(
       `https://api.carbondefi.xyz/v1/sei/market-rate?address=${tokenAddress}&convert=usd`,
@@ -31,11 +32,12 @@ async function fetchTokenPrice(tokenAddress: string): Promise<BigNumber> {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data = await response.json();
-    if (!data || typeof data.USD !== "number") {
+    const { data } = await response.json();
+
+    if (!data || !data?.USD || isNaN(Number(data.USD))) {
       throw new Error("Invalid price data received from API");
     }
-    return BigNumber.from(data.USD);
+    return new Decimal(data.USD);
   } catch (error) {
     throw new Error(
       `Failed to fetch price for token ${tokenAddress} : ${error}`,
@@ -75,21 +77,21 @@ async function getBuySellRange(
       ? sellRange
       : [sellRange, sellRange];
 
-    const buyRangeBN = [buyMin, buyMax]
-      .map(BigNumber.from)
-      .sort((a, b) => a.sub(b).toNumber());
+    const buyRangeSorted = [buyMin, buyMax].sort((a, b) =>
+      new Decimal(a).sub(new Decimal(b)).toNumber(),
+    );
 
-    const sellRangeBN = [sellMin, sellMax]
-      .map(BigNumber.from)
-      .sort((a, b) => a.sub(b).toNumber());
+    const sellRangeSorted = [sellMin, sellMax].sort((a, b) =>
+      new Decimal(a).sub(new Decimal(b)).toNumber(),
+    );
 
     return {
-      buyPriceLow: buyRangeBN[0].toString(),
-      buyPriceMarginal: buyRangeBN[1].toString(),
-      buyPriceHigh: buyRangeBN[1].toString(),
-      sellPriceLow: sellRangeBN[0].toString(),
-      sellPriceMarginal: sellRangeBN[0].toString(),
-      sellPriceHigh: sellRangeBN[1].toString(),
+      buyPriceLow: buyRangeSorted[0].toString(),
+      buyPriceMarginal: buyRangeSorted[1].toString(),
+      buyPriceHigh: buyRangeSorted[1].toString(),
+      sellPriceLow: sellRangeSorted[0].toString(),
+      sellPriceMarginal: sellRangeSorted[0].toString(),
+      sellPriceHigh: sellRangeSorted[1].toString(),
     };
   }
 
@@ -98,10 +100,10 @@ async function getBuySellRange(
     const marketPrice = await getMarketPrice(baseToken, quoteToken);
 
     // Calculate ranges based on market price and spread
-    const buyLow = BigNumber.from(marketPrice).mul(1 - DEFAULT_SPREAD_OUTER);
-    const buyHigh = BigNumber.from(marketPrice).mul(1 - DEFAULT_SPREAD_INNER);
-    const sellLow = BigNumber.from(marketPrice).mul(1 + DEFAULT_SPREAD_INNER);
-    const sellHigh = BigNumber.from(marketPrice).mul(1 + DEFAULT_SPREAD_OUTER);
+    const buyLow = new Decimal(marketPrice).mul(1 - DEFAULT_SPREAD_OUTER);
+    const buyHigh = new Decimal(marketPrice).mul(1 - DEFAULT_SPREAD_INNER);
+    const sellLow = new Decimal(marketPrice).mul(1 + DEFAULT_SPREAD_INNER);
+    const sellHigh = new Decimal(marketPrice).mul(1 + DEFAULT_SPREAD_OUTER);
 
     return {
       buyPriceLow: buyLow.toString(),
@@ -185,48 +187,48 @@ async function getOverlappingPrices(
   quoteToken: string,
   buyPriceLow: string | undefined,
   sellPriceHigh: string | undefined,
+  marketPriceOverride: string | undefined,
+  range: number,
 ) {
+  const marketPrice =
+    marketPriceOverride ?? (await getMarketPrice(baseToken, quoteToken));
+
   if (buyPriceLow && sellPriceHigh) {
-    const marketPrice = BigNumber.from(sellPriceHigh)
-      .sub(buyPriceLow)
-      .div(2)
-      .toString();
     return {
       buyPriceLow,
       sellPriceHigh,
       marketPrice,
     };
   }
-  const marketPrice = await getMarketPrice(baseToken, quoteToken);
 
   if (!buyPriceLow && !sellPriceHigh) {
-    const newPriceLow = BigNumber.from(marketPrice)
-      .mul(100 - DEFAULT_RANGE)
+    const newBuyPriceLow = new Decimal(marketPrice)
+      .mul(100 - range)
       .div(100)
-      .toString();
-    const newPriceHigh = BigNumber.from(marketPrice)
-      .mul(100 + DEFAULT_RANGE)
+      .toFixed(0);
+    const newSellPriceHigh = new Decimal(marketPrice)
+      .mul(100 + range)
       .div(100)
-      .toString();
+      .toFixed(0);
 
     return {
-      buyPriceLow: newPriceLow,
-      sellPriceHigh: newPriceHigh,
+      buyPriceLow: newBuyPriceLow,
+      sellPriceHigh: newSellPriceHigh,
       marketPrice,
     };
   }
 
-  const marketPriceBN = BigNumber.from(marketPrice);
-  const sellPriceHighBN = BigNumber.from(sellPriceHigh);
-  const buyPriceLowBN = BigNumber.from(buyPriceLow);
+  const marketPriceBN = new Decimal(marketPrice);
+  const sellPriceHighBN = new Decimal(sellPriceHigh || 0);
+  const buyPriceLowBN = new Decimal(buyPriceLow || 0);
 
   // Only one of buyPriceLow or sellPriceHigh is undefined
   const newBuyPriceLow =
     buyPriceLow ??
-    marketPriceBN.sub(marketPriceBN.sub(sellPriceHighBN)).toString();
+    marketPriceBN.sub(sellPriceHighBN.sub(marketPriceBN)).toFixed(0);
   const newSellPriceHigh =
     sellPriceHigh ??
-    marketPriceBN.add(buyPriceLowBN.sub(marketPriceBN)).toString();
+    marketPriceBN.add(marketPriceBN.sub(buyPriceLowBN)).toFixed(0);
 
   return {
     buyPriceLow: newBuyPriceLow,
@@ -244,6 +246,7 @@ async function getOverlappingBudgets(
   buyBudget: string | undefined,
   sellBudget: string | undefined,
   marketPrice: string,
+  fee: number,
 ) {
   if (!buyBudget && !sellBudget) {
     throw new Error(
@@ -264,7 +267,7 @@ async function getOverlappingBudgets(
         buyPriceLow,
         sellPriceHigh,
         marketPrice,
-        String(DEFAULT_RANGE),
+        String(fee),
         sellBudget,
       );
     if (!buyBudget) {
@@ -282,7 +285,7 @@ async function getOverlappingBudgets(
         buyPriceLow,
         sellPriceHigh,
         marketPrice,
-        String(DEFAULT_RANGE),
+        String(fee),
         buyBudget,
       );
     if (!sellBudget) {
@@ -294,9 +297,10 @@ async function getOverlappingBudgets(
   }
 
   // If both budgets are defined, use the smaller one
-  const isBuyBudgetSmaller =
-    overlappingSellBudget &&
-    BigNumber.from(overlappingSellBudget).lt(sellBudget || 0);
+  const overlappingSellBudgetDecimal = new Decimal(overlappingSellBudget || 0);
+  const isBuyBudgetSmaller = overlappingSellBudgetDecimal.lt(
+    new Decimal(sellBudget || 0),
+  );
   const parsedBuyBudget = isBuyBudgetSmaller ? buyBudget : overlappingBuyBudget;
   const parsedSellBudget = isBuyBudgetSmaller
     ? overlappingSellBudget
@@ -317,6 +321,8 @@ export async function getOverlappingStrategyParams(
   buyBudgetRaw: string | undefined,
   sellBudgetRaw: string | undefined,
   fee: number,
+  range: number,
+  marketPriceOverride: string | undefined,
 ): Promise<{
   buyPriceLow: string;
   buyPriceMarginal: string;
@@ -336,9 +342,9 @@ export async function getOverlappingStrategyParams(
     quoteToken,
     buyPriceLowRaw,
     sellPriceHighRaw,
+    marketPriceOverride,
+    range,
   );
-
-  const spreadPercentage = fee ? String(fee) : String(DEFAULT_FEE);
 
   const {
     buyPriceLow,
@@ -347,12 +353,12 @@ export async function getOverlappingStrategyParams(
     sellPriceLow,
     sellPriceHigh,
     sellPriceMarginal,
-    marketPrice,
+    marketPrice: finalMarketPrice,
   } = calculateOverlappingPrices(
     parsedBuyPriceLow,
     parsedSellPriceHigh,
     parsedMarketPrice,
-    spreadPercentage,
+    String(fee),
   );
 
   const { buyBudget, sellBudget } = await getOverlappingBudgets(
@@ -363,7 +369,8 @@ export async function getOverlappingStrategyParams(
     sellPriceHigh,
     buyBudgetRaw,
     sellBudgetRaw,
-    marketPrice,
+    finalMarketPrice,
+    fee,
   );
 
   return {
@@ -377,3 +384,29 @@ export async function getOverlappingStrategyParams(
     sellBudget,
   };
 }
+
+export const getAllTokenDecimals = async (
+  agent: SeiAgentKit,
+  tokenAddress: Address,
+) => {
+  if (tokenAddress === CARBON_NATIVE_SEI_ADDRESS) {
+    return 18;
+  }
+
+  return getTokenDecimals(agent, tokenAddress);
+};
+
+export const getCarbonTokenAddress = async (
+  seiKit: SeiAgentKit,
+  tokenTicker: string,
+): Promise<Address> => {
+  if (tokenTicker === "SEI") {
+    return CARBON_NATIVE_SEI_ADDRESS;
+  }
+
+  const address = await seiKit.getTokenAddressFromTicker(tokenTicker);
+  if (address === null) {
+    throw new Error("Cannot find token address");
+  }
+  return address;
+};

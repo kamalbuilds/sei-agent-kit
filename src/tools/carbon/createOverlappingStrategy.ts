@@ -6,10 +6,10 @@ import {
   ContractsConfig,
 } from "@bancor/carbon-sdk/contracts-api";
 import { JsonRpcProvider } from "@ethersproject/providers";
-
 import { SeiAgentKit } from "../../index";
 import { SEI_RPC_URL, MAX_BLOCK_AGE } from "../../constants";
 import { getOverlappingStrategyParams } from "./utils";
+import { Address } from "viem";
 
 /**
  
@@ -17,13 +17,15 @@ import { getOverlappingStrategyParams } from "./utils";
 export async function createOverlappingStrategy(
   agent: SeiAgentKit,
   config: ContractsConfig,
-  baseToken: string,
-  quoteToken: string,
-  sellPriceLow: string | undefined,
-  buyPriceHigh: string | undefined,
+  baseToken: Address,
+  quoteToken: Address,
+  buyPriceLow: string | undefined,
+  sellPriceHigh: string | undefined,
   buyBudget: string | undefined,
   sellBudget: string | undefined,
   fee: number,
+  range: number,
+  marketPriceOverride: string | undefined,
   overrides?: PayableOverrides,
 ): Promise<string | null> {
   const provider = new JsonRpcProvider(SEI_RPC_URL);
@@ -32,35 +34,52 @@ export async function createOverlappingStrategy(
   const carbonSDK = new Toolkit(api, cache, undefined);
 
   const {
-    buyPriceLow,
+    buyPriceLow: parsedBuyPriceLow,
     buyPriceMarginal,
-    buyPriceHigh: parsedBuyPriceHigh,
+    buyPriceHigh,
     buyBudget: parsedBuyBudget,
-    sellPriceLow: parsedSellPriceLow,
+    sellPriceLow,
     sellPriceMarginal,
-    sellPriceHigh,
+    sellPriceHigh: parsedSellPriceHigh,
     sellBudget: parsedSellBudget,
   } = await getOverlappingStrategyParams(
     carbonSDK,
     baseToken,
     quoteToken,
-    sellPriceLow,
-    buyPriceHigh,
+    buyPriceLow,
+    sellPriceHigh,
     buyBudget,
     sellBudget,
     fee,
+    range,
+    marketPriceOverride,
   );
+
+  console.log(`
+    Creating Overlapping Strategy
+    
+    baseToken is ${baseToken}
+    quoteToken is ${quoteToken}
+    buyBudget is ${parsedBuyBudget}
+    buyPriceLow is ${parsedBuyPriceLow}
+    buyPriceMarginal is ${buyPriceMarginal}
+    buyPriceHigh is ${buyPriceHigh}
+    sellBudget is ${parsedSellBudget}
+    sellPriceLow is ${sellPriceLow}
+    sellPriceMarginal is ${sellPriceMarginal}
+    sellPriceHigh is ${parsedSellPriceHigh}
+    `);
 
   const populatedTx = await carbonSDK.createBuySellStrategy(
     baseToken,
     quoteToken,
-    buyPriceLow,
+    parsedBuyPriceLow,
     buyPriceMarginal,
-    parsedBuyPriceHigh,
+    buyPriceHigh,
     parsedBuyBudget,
-    parsedSellPriceLow,
+    sellPriceLow,
     sellPriceMarginal,
-    sellPriceHigh,
+    parsedSellPriceHigh,
     parsedSellBudget,
     overrides,
   );

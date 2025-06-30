@@ -1,8 +1,7 @@
 import { StructuredTool } from "langchain/tools";
 import { SeiAgentKit } from "../../agent";
 import { z } from "zod";
-import { Address } from "viem";
-import { carbonConfig } from "../../tools/carbon/utils";
+import { carbonConfig, getCarbonTokenAddress } from "../../tools/carbon/utils";
 
 const CreateStrategyInputSchema = z
   .object({
@@ -65,11 +64,20 @@ export class CarbonCreateStrategyTool extends StructuredTool<
     input: z.infer<typeof CreateStrategyInputSchema>,
   ): Promise<string> {
     try {
+      const token0Address = await getCarbonTokenAddress(
+        this.seiKit,
+        input.token0Ticker,
+      );
+      const token1Address = await getCarbonTokenAddress(
+        this.seiKit,
+        input.token1Ticker,
+      );
+
       const result = await this.seiKit.createBuySellStrategy(
         carbonConfig,
         input.type,
-        input.token0Ticker as Address,
-        input.token1Ticker as Address,
+        token0Address,
+        token1Address,
         input.buyRange,
         input.sellRange,
         input.buyAmount,

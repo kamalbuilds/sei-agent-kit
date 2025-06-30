@@ -4,12 +4,11 @@ import {
   http,
   PublicClient as ViemPublicClient,
   Address,
-  Account,
   createWalletClient,
 } from "viem";
 import { sei } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
-import { TradeActionBNStr, PayableOverrides, StrategyUpdate, EncodedStrategyBNStr } from '@bancor/carbon-sdk';
+import { TradeActionBNStr, PayableOverrides, StrategyUpdate, EncodedStrategyBNStr, Strategy } from '@bancor/carbon-sdk';
 import { ContractsConfig } from '@bancor/carbon-sdk/contracts-api';
 import { MarginalPriceOptions } from '@bancor/carbon-sdk/strategy-management';
 import {
@@ -19,12 +18,7 @@ import {
   createBuySellStrategy,
   createOverlappingStrategy,
   deleteStrategy,
-  getLiquidityByPair,
-  getMaxRateByPair,
-  getMinRateByPair,
-  getRateLiquidityDepthsByPair,
   getUserStrategies,
-  hasLiquidityByPair,
   updateStrategy,
 } from '../tools';
 import { Config } from '../interfaces';
@@ -364,8 +358,8 @@ export class SeiAgentKit {
   async createBuySellStrategy(
     config: ContractsConfig,
     type: StrategyType,
-    baseToken: string,
-    quoteToken: string,
+    baseToken: Address,
+    quoteToken: Address,
     buyRange: string | string[] | undefined,
     sellRange: string | string[] | undefined,
     buyBudget: string | undefined,
@@ -380,8 +374,8 @@ export class SeiAgentKit {
    * @param config The Carbon contracts configuration.
    * @param baseToken The address of the base token.
    * @param quoteToken The address of the quote token.
-   * @param sellPriceLow The lower bound of the sell price range.
-   * @param buyPriceHigh The upper bound of the buy price range.
+   * @param sellPriceHigh The lower bound of the sell price range.
+   * @param buyPriceLow The upper bound of the buy price range.
    * @param buyBudget The budget allocated for buying.
    * @param sellBudget The budget allocated for selling.
    * @param overrides Optional transaction overrides.
@@ -389,16 +383,18 @@ export class SeiAgentKit {
    */
   async createOverlappingStrategy(
     config: ContractsConfig,
-    baseToken: string,
-    quoteToken: string,
-    sellPriceLow: string | undefined,
-    buyPriceHigh: string | undefined,
+    baseToken: Address,
+    quoteToken: Address,
+    buyPriceLow: string | undefined,
+    sellPriceHigh: string | undefined,
     buyBudget: string | undefined,
     sellBudget: string | undefined,
     fee: number,
+    range: number,
+    marketPriceOverride: string | undefined,
     overrides?: PayableOverrides,
   ): Promise<string | null> {
-    return createOverlappingStrategy(this, config, baseToken, quoteToken, sellPriceLow, buyPriceHigh, buyBudget, sellBudget, fee, overrides);
+    return createOverlappingStrategy(this, config, baseToken, quoteToken, buyPriceLow, sellPriceHigh, buyBudget, sellBudget, fee, range, marketPriceOverride, overrides);
   }
 
   /**
@@ -409,71 +405,9 @@ export class SeiAgentKit {
    */
   async deleteStrategy(
     config: ContractsConfig,
-    strategyId: string
+    strategyId: string,
   ): Promise<string | null> {
     return deleteStrategy(this, config, strategyId);
-  }
-
-  /**
-   * Gets the liquidity for a token pair using Carbon SDK.
-   * @param config The Carbon contracts configuration.
-   * @param sourceToken The address of the source token.
-   * @param targetToken The address of the target token.
-   * @returns Promise with the liquidity information or null.
-   */
-  async getLiquidityByPair(
-    config: ContractsConfig,
-    sourceToken: string,
-    targetToken: string
-  ): Promise<string | null> {
-    return getLiquidityByPair(this, config, sourceToken, targetToken);
-  }
-
-  /**
-   * Gets the maximum rate for a token pair using Carbon SDK.
-   * @param config The Carbon contracts configuration.
-   * @param sourceToken The address of the source token.
-   * @param targetToken The address of the target token.
-   * @returns Promise with the maximum rate or null.
-   */
-  async getMaxRateByPair(
-    config: ContractsConfig,
-    sourceToken: string,
-    targetToken: string
-  ): Promise<string | null> {
-    return getMaxRateByPair(this, config, sourceToken, targetToken);
-  }
-
-  /**
-   * Gets the minimum rate for a token pair using Carbon SDK.
-   * @param config The Carbon contracts configuration.
-   * @param sourceToken The address of the source token.
-   * @param targetToken The address of the target token.
-   * @returns Promise with the minimum rate or null.
-   */
-  async getMinRateByPair(
-    config: ContractsConfig,
-    sourceToken: string,
-    targetToken: string
-  ): Promise<string | null> {
-    return getMinRateByPair(this, config, sourceToken, targetToken);
-  }
-
-  /**
-   * Gets the rate liquidity depths for a token pair using Carbon SDK.
-   * @param config The Carbon contracts configuration.
-   * @param sourceToken The address of the source token.
-   * @param targetToken The address of the target token.
-   * @param rates An array of rates to query.
-   * @returns Promise with the liquidity depth information or null.
-   */
-  async getRateLiquidityDepthsByPair(
-    config: ContractsConfig,
-    sourceToken: string,
-    targetToken: string,
-    rates: string[]
-  ): Promise<string | null> {
-    return getRateLiquidityDepthsByPair(this, config, sourceToken, targetToken, rates);
   }
 
   /**
@@ -484,24 +418,9 @@ export class SeiAgentKit {
    */
   async getUserStrategies(
     config: ContractsConfig,
-    user?: `0x${string}`
-  ): Promise<string | null> {
-    return getUserStrategies(this, config, user);
-  }
-
-  /**
-   * Checks if there is liquidity for a token pair using Carbon SDK.
-   * @param config The Carbon contracts configuration.
-   * @param sourceToken The address of the source token.
-   * @param targetToken The address of the target token.
-   * @returns Promise with a boolean indicating liquidity presence or null.
-   */
-  async hasLiquidityByPair(
-    config: ContractsConfig,
-    sourceToken: string,
-    targetToken: string
-  ): Promise<string | null> {
-    return hasLiquidityByPair(this, config, sourceToken, targetToken);
+    user: `0x${string}`,
+  ): Promise<Strategy[] | null> {
+    return getUserStrategies(config, user);
   }
 
   /**
