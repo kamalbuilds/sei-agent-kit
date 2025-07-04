@@ -5,7 +5,7 @@ import {
 } from "@bancor/carbon-sdk/strategy-management";
 import { SeiAgentKit } from "../../agent";
 import { Address } from "viem";
-import { getTokenDecimals } from "../../utils";
+import { approveToken, getTokenDecimals } from "../../utils";
 import { Decimal } from "@bancor/carbon-sdk/utils";
 
 const CARBON_NATIVE_SEI_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
@@ -13,6 +13,8 @@ const CARBON_NATIVE_SEI_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 // Disposable/recurring defaults
 const DEFAULT_SPREAD_INNER = 0.01; // %
 const DEFAULT_SPREAD_OUTER = 0.05; // %
+
+export const UINT256_MAX = (1n << 256n) - 1n; // For infinite approvals
 
 export const carbonConfig: ContractsConfig = {
   carbonControllerAddress: "0xe4816658ad10bF215053C533cceAe3f59e1f1087",
@@ -190,6 +192,15 @@ async function getOverlappingPrices(
   marketPriceOverride: string | undefined,
   range: number,
 ) {
+  console.log(`getOverlappingPrices params:
+  baseToken: ${baseToken},
+  quoteToken: ${quoteToken},
+  buyPriceLow: ${buyPriceLow},
+  sellPriceHigh: ${sellPriceHigh},
+  marketPriceOverride: ${marketPriceOverride},
+  range: ${range},
+    `);
+
   const marketPrice =
     marketPriceOverride ?? (await getMarketPrice(baseToken, quoteToken));
 
@@ -205,11 +216,11 @@ async function getOverlappingPrices(
     const newBuyPriceLow = new Decimal(marketPrice)
       .mul(100 - range)
       .div(100)
-      .toFixed(0);
+      .toString();
     const newSellPriceHigh = new Decimal(marketPrice)
       .mul(100 + range)
       .div(100)
-      .toFixed(0);
+      .toString();
 
     return {
       buyPriceLow: newBuyPriceLow,
@@ -225,10 +236,10 @@ async function getOverlappingPrices(
   // Only one of buyPriceLow or sellPriceHigh is undefined
   const newBuyPriceLow =
     buyPriceLow ??
-    marketPriceBN.sub(sellPriceHighBN.sub(marketPriceBN)).toFixed(0);
+    marketPriceBN.sub(sellPriceHighBN.sub(marketPriceBN)).toString();
   const newSellPriceHigh =
     sellPriceHigh ??
-    marketPriceBN.add(marketPriceBN.sub(buyPriceLowBN)).toFixed(0);
+    marketPriceBN.add(marketPriceBN.sub(buyPriceLowBN)).toString();
 
   return {
     buyPriceLow: newBuyPriceLow,
@@ -257,6 +268,8 @@ async function getOverlappingBudgets(
   // Overlapping is created around market price with the passed input range
   let overlappingBuyBudget: string | undefined;
   let overlappingSellBudget: string | undefined;
+
+  console.log(`sellBudget is ${sellBudget} and buyBudget is ${buyBudget}`);
 
   // Calculate budgets based on which one is defined
   if (sellBudget) {
@@ -346,6 +359,12 @@ export async function getOverlappingStrategyParams(
     range,
   );
 
+  console.log(`getOverlappingPrices result:
+  parsedBuyPriceLow: ${parsedBuyPriceLow},
+  parsedSellPriceHigh: ${parsedSellPriceHigh},
+  parsedMarketPrice: ${parsedMarketPrice},
+    `);
+
   const {
     buyPriceLow,
     buyPriceHigh,
@@ -409,4 +428,14 @@ export const getCarbonTokenAddress = async (
     throw new Error("Cannot find token address");
   }
   return address;
+};
+
+export const carbonERC20InfiniteApproval = (
+  agent: SeiAgentKit,
+  tokenAddress: Address,
+  spender: Address,
+) => {
+  if (tokenAddress !== CARBON_NATIVE_SEI_ADDRESS) {
+    approveToken(agent, tokenAddress, spender, UINT256_MAX);
+  }
 };

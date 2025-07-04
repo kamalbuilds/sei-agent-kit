@@ -8,8 +8,9 @@ export * from "./dragonswap";
 
 import type { SeiAgentKit } from "../agent";
 import {
+  CarbonCreateDisposableStrategyTool,
+  CarbonCreateRecurringStrategyTool,
   CarbonCreateOverlappingStrategyTool,
-  CarbonCreateStrategyTool,
   CarbonDeleteStrategyTool,
   CarbonGetUserStrategiesTool,
 } from "./carbon";
@@ -52,7 +53,8 @@ export function createSeiTools(seiKit: SeiAgentKit) {
     new SeiRedeemTakaraTool(seiKit),
     new SeiGetRedeemableAmountTool(seiKit),
     new SeiGetBorrowBalanceTool(seiKit),
-    new CarbonCreateStrategyTool(seiKit),
+    new CarbonCreateDisposableStrategyTool(seiKit),
+    new CarbonCreateRecurringStrategyTool(seiKit),
     new CarbonCreateOverlappingStrategyTool(seiKit),
     new CarbonDeleteStrategyTool(seiKit),
     new CarbonGetUserStrategiesTool(seiKit),

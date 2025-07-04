@@ -3,9 +3,8 @@ import { SeiAgentKit } from "../../agent";
 import { z } from "zod";
 import { carbonConfig, getCarbonTokenAddress } from "../../tools/carbon/utils";
 
-const CreateStrategyInputSchema = z
+const CreateRecurringStrategyInputSchema = z
   .object({
-    type: z.enum(["disposable", "recurring"]),
     token0Ticker: z.string().min(1, "First token ticker must not be empty"),
     token1Ticker: z.string().min(1, "Second token ticker must not be empty"),
     sellRange: z
@@ -28,40 +27,37 @@ const CreateStrategyInputSchema = z
     buyAmount: z.string().optional(),
   })
   .refine(
-    (data) =>
-      (data.sellAmount !== undefined && Number(data.sellAmount) > 1) ||
-      (data.buyAmount !== undefined && Number(data?.buyAmount) > 1),
+    (data) => data.sellAmount !== undefined && data.buyAmount !== undefined,
     {
       message: "At least one of sellAmount or buyAmount must be defined",
       path: ["sellAmount", "buyAmount"],
     },
   );
 
-export class CarbonCreateStrategyTool extends StructuredTool<
-  typeof CreateStrategyInputSchema
+export class CarbonCreateRecurringStrategyTool extends StructuredTool<
+  typeof CreateRecurringStrategyInputSchema
 > {
-  name = "carbon_create_strategy";
-  description = `Creates a Carbon strategy. 
+  name = "carbon_create_recurring_strategy";
+  description = `Creates a Recurring Carbon strategy. 
   If a buy or a sell range is not defined, USD prices will be used to achieve a +-1% spread.
 
   At least one of [buyAmount, sellAmount] must be defined.
   
   Parameters:
-  - type: The type of Carbon strategy (disposable, recurring)
   - token0Ticker: The ticker symbol of the first token (e.g., "SEI").
   - token1Ticker: The ticker symbol of the second token (e.g., "USDC").
-  - sellRange: Optional. The range to sell the first token for the second token as either a string value or a string array of length 2 (e.g., "1.5").
-  - buyRange: Optional. The range to buy the first token for the second token as either a string value or a string array of length 2 (e.g., "1.5").
+  - sellRange: The range to sell the first token for the second token as either a string value or a string array of length 2 (e.g., "1.5").
+  - buyRange: The range to buy the first token for the second token as either a string value or a string array of length 2 (e.g., "1.5").
   - sellAmount: Optional. The amount of the first token to add as a string (e.g., "1.5").
   - buyAmount: Optional. The amount of the second token to add as a string (e.g., "100").`;
-  schema = CreateStrategyInputSchema;
+  schema = CreateRecurringStrategyInputSchema;
 
   constructor(private readonly seiKit: SeiAgentKit) {
     super();
   }
 
   protected async _call(
-    input: z.infer<typeof CreateStrategyInputSchema>,
+    input: z.infer<typeof CreateRecurringStrategyInputSchema>,
   ): Promise<string> {
     try {
       const token0Address = await getCarbonTokenAddress(
@@ -75,7 +71,7 @@ export class CarbonCreateStrategyTool extends StructuredTool<
 
       const result = await this.seiKit.createBuySellStrategy(
         carbonConfig,
-        input.type,
+        "recurring",
         token0Address,
         token1Address,
         input.buyRange,

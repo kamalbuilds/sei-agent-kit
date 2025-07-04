@@ -8,8 +8,13 @@ import {
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { SeiAgentKit } from "../../index";
 import { SEI_RPC_URL, MAX_BLOCK_AGE } from "../../constants";
-import { getOverlappingStrategyParams } from "./utils";
-import { Address } from "viem";
+import {
+  carbonERC20InfiniteApproval,
+  getOverlappingStrategyParams,
+  UINT256_MAX,
+} from "./utils";
+import { Account, Address } from "viem";
+import { approveToken } from "../../utils";
 
 /**
  
@@ -55,6 +60,23 @@ export async function createOverlappingStrategy(
     marketPriceOverride,
   );
 
+  // 1. Approve required tokens
+  console.log(`Setting approval for ${baseToken} and ${quoteToken}`);
+  const carbonController = config.carbonControllerAddress as `0x${string}`;
+  if (!carbonController) {
+    throw new Error("Carbon Controller Address cannot be undefined");
+  }
+  carbonERC20InfiniteApproval(
+    agent,
+    baseToken,
+    carbonController as `0x${string}`,
+  );
+  carbonERC20InfiniteApproval(
+    agent,
+    quoteToken,
+    carbonController as `0x${string}`,
+  );
+
   console.log(`
     Creating Overlapping Strategy
     
@@ -69,7 +91,7 @@ export async function createOverlappingStrategy(
     sellPriceMarginal is ${sellPriceMarginal}
     sellPriceHigh is ${parsedSellPriceHigh}
     `);
-
+  // 2. Create strategy populated tx
   const populatedTx = await carbonSDK.createBuySellStrategy(
     baseToken,
     quoteToken,
@@ -86,7 +108,7 @@ export async function createOverlappingStrategy(
 
   const viemTx = {
     chain: agent.walletClient.chain,
-    account: agent.walletClient.account?.address as `0x${string}`,
+    account: agent.walletClient.account as Account,
     to: populatedTx.to as `0x${string}`,
     data: populatedTx.data as `0x${string}`,
     value: populatedTx.value ? BigInt(populatedTx.value.toString()) : 0n,

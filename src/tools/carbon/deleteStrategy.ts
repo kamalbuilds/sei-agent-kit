@@ -8,6 +8,7 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 
 import { SeiAgentKit } from "../../index";
 import { SEI_RPC_URL, MAX_BLOCK_AGE } from "../../constants";
+import { Account } from "viem";
 
 /**
  
@@ -26,7 +27,7 @@ export async function deleteStrategy(
 
   const viemTx = {
     chain: agent.walletClient.chain,
-    account: agent.walletClient.account?.address as `0x${string}`,
+    account: agent.walletClient.account as Account,
     to: populatedTx.to as `0x${string}`,
     data: populatedTx.data as `0x${string}`,
     value: 0n,
