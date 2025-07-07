@@ -121,6 +121,51 @@ async function getBuySellRange(
   }
 }
 
+function validateDisposableParams(
+  buyBudget: string | undefined,
+  sellBudget: string | undefined,
+  buyRange: string | string[] | undefined,
+  sellRange: string | string[] | undefined,
+) {
+  if (buyBudget !== undefined && sellBudget !== undefined) {
+    throw new Error(
+      "Disposable strategy can only have one of buyBudget or sellBudget defined",
+    );
+  }
+  if (buyRange !== undefined && sellRange !== undefined) {
+    throw new Error(
+      "Disposable strategy can only have one of buyRange or sellRange defined",
+    );
+  }
+  if (buyRange === undefined && sellRange === undefined) {
+    throw new Error(
+      "Disposable strategy must have either buyRange or sellRange defined",
+    );
+  }
+  if (buyBudget === undefined && sellBudget === undefined) {
+    throw new Error(
+      "Disposable strategy must have either buyBudget or sellBudget defined",
+    );
+  }
+  if (buyBudget === undefined && buyRange !== undefined) {
+    throw new Error("Disposable strategy has a buy budget but no buy range");
+  }
+  if (sellBudget === undefined && sellRange !== undefined) {
+    throw new Error("Disposable strategy has a sell budget but no sell range");
+  }
+}
+
+function validateRecurringParams(
+  buyBudget: string | undefined,
+  sellBudget: string | undefined,
+) {
+  if (!buyBudget && !sellBudget) {
+    throw new Error(
+      "Recurring strategy requires at least one budget to be defined",
+    );
+  }
+}
+
 export async function getStrategyTypeParams(
   type: StrategyType,
   baseToken: string,
@@ -141,16 +186,7 @@ export async function getStrategyTypeParams(
 }> {
   // Disposable strategy only has one buy or one sell order
   if (type === "disposable") {
-    if (buyBudget !== undefined && sellBudget !== undefined) {
-      throw new Error(
-        "Disposable strategy can only have one of buyBudget or sellBudget defined",
-      );
-    }
-    if (buyBudget === undefined && sellBudget === undefined) {
-      throw new Error(
-        "Disposable strategy must have either buyBudget or sellBudget defined",
-      );
-    }
+    validateDisposableParams(buyBudget, sellBudget, buyRange, sellRange);
 
     const strategyTypeParams = await getBuySellRange(
       baseToken,
@@ -166,10 +202,7 @@ export async function getStrategyTypeParams(
     };
   }
 
-  // Recurring strategy has a buy and sell range defined
-  if (!buyRange || !sellRange) {
-    throw new Error("Recurring strategy requires both budgets to be defined");
-  }
+  validateRecurringParams(buyBudget, sellBudget);
 
   const strategyTypeParams = await getBuySellRange(
     baseToken,
@@ -192,15 +225,6 @@ async function getOverlappingPrices(
   marketPriceOverride: string | undefined,
   range: number,
 ) {
-  console.log(`getOverlappingPrices params:
-  baseToken: ${baseToken},
-  quoteToken: ${quoteToken},
-  buyPriceLow: ${buyPriceLow},
-  sellPriceHigh: ${sellPriceHigh},
-  marketPriceOverride: ${marketPriceOverride},
-  range: ${range},
-    `);
-
   const marketPrice =
     marketPriceOverride ?? (await getMarketPrice(baseToken, quoteToken));
 
@@ -268,8 +292,6 @@ async function getOverlappingBudgets(
   // Overlapping is created around market price with the passed input range
   let overlappingBuyBudget: string | undefined;
   let overlappingSellBudget: string | undefined;
-
-  console.log(`sellBudget is ${sellBudget} and buyBudget is ${buyBudget}`);
 
   // Calculate budgets based on which one is defined
   if (sellBudget) {
@@ -358,12 +380,6 @@ export async function getOverlappingStrategyParams(
     marketPriceOverride,
     range,
   );
-
-  console.log(`getOverlappingPrices result:
-  parsedBuyPriceLow: ${parsedBuyPriceLow},
-  parsedSellPriceHigh: ${parsedSellPriceHigh},
-  parsedMarketPrice: ${parsedMarketPrice},
-    `);
 
   const {
     buyPriceLow,
