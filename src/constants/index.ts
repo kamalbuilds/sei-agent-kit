@@ -1,4 +1,4 @@
-import { IToken } from "../interfaces";
+import { IToken } from "../types";
 
 export const SEI_RPC_URL = "https://evm-rpc.sei-apis.com/";
 export const MAX_BLOCK_AGE = 2000; // past this many blocks, the SDK won't attempt to catch up by processing events and instead call the contracts for strategy info.
@@ -109,7 +109,7 @@ export const TOKENS: { [key: `0x${string}`]: IToken } = {
       decimals: 6,
       initialSupply: "10000000000000000000000000000000",
       logoUrl:
-        "https://raw.githubusercontent.com/dragonswap-app/assets/refs/heads/main/logos/0x95597EB8D227a7c4B4f5E807a815C5178eE6dBE1/logo.png",
+        "https://assets.cambrian.wtf/logos/milli.png",
     },
   },
   "0x64445f0aecc51e94ad52d8ac56b7190e764e561a": {
@@ -133,7 +133,7 @@ export const TOKENS: { [key: `0x${string}`]: IToken } = {
       decimals: 18,
       initialSupply: "10000000000000000000000000000000",
       logoUrl:
-        "https://raw.githubusercontent.com/dragonswap-app/assets/main/logos/0x5c85726f71aFB7e26d769fB559Ce0168CE1F8f4E/logo.png",
+        "https://assets.cambrian.wtf/logos/usa.png",
     },
   },
 
@@ -146,7 +146,7 @@ export const TOKENS: { [key: `0x${string}`]: IToken } = {
       decimals: 18,
       initialSupply: "10000000000000000000000000000000",
       logoUrl:
-        "https://raw.githubusercontent.com/dragonswap-app/assets/main/logos/0x9C367a272f8E318D10118C6367fD69DEf30e430E/logo.png",
+        "https://assets.cambrian.wtf/logos/pepei.png",
     },
   },
   "0xecf7f1efc9620a911339619c91c9fa0f71e0600e": {
@@ -158,7 +158,7 @@ export const TOKENS: { [key: `0x${string}`]: IToken } = {
       decimals: 18,
       initialSupply: "10000000000000000000000000000000",
       logoUrl:
-        "https://raw.githubusercontent.com/dragonswap-app/assets/main/logos/0xECf7f1EFC9620A911339619C91c9FA0f71e0600E/logo.png",
+        "https://assets.cambrian.wtf/logos/seiyun.png",
     },
   },
   "0xd78be621436e69c81e4d0e9f29be14c5ec51e6ae": {
@@ -170,7 +170,7 @@ export const TOKENS: { [key: `0x${string}`]: IToken } = {
       decimals: 18,
       initialSupply: "10000000000000000000000000000000",
       logoUrl:
-        "https://raw.githubusercontent.com/dragonswap-app/assets/main/logos/0xd78BE621436e69C81E4d0e9f29bE14C5EC51E6Ae/logo.png",
+        "https://assets.cambrian.wtf/logos/gonad.png",
     },
   },
   "0x9134d733aac991b96e899af657c717276a627e32": {
@@ -182,7 +182,7 @@ export const TOKENS: { [key: `0x${string}`]: IToken } = {
       decimals: 18,
       initialSupply: "10000000000000000000000000000000",
       logoUrl:
-        "https://raw.githubusercontent.com/dragonswap-app/assets/main/logos/0x9134d733AaC991b96E899af657C717276A627E32/logo.png",
+        "https://assets.cambrian.wtf/logos/froy.png",
     },
   },
   "0xb8d41db605a3258010d531429e85b13c7abde579": {
@@ -194,7 +194,7 @@ export const TOKENS: { [key: `0x${string}`]: IToken } = {
       decimals: 18,
       initialSupply: "10000000000000000000000000000000",
       logoUrl:
-        "https://raw.githubusercontent.com/dragonswap-app/assets/main/logos/0xb8D41DB605A3258010D531429E85b13C7abdE579/logo.png",
+        "https://assets.cambrian.wtf/logos/chuck.png",
     },
   },
   "0xc6bc81a0e287cc8103cc002147a9d76cae4cd6e5": {
@@ -206,7 +206,7 @@ export const TOKENS: { [key: `0x${string}`]: IToken } = {
       decimals: 18,
       initialSupply: "10000000000000000000000000000000",
       logoUrl:
-        "https://raw.githubusercontent.com/dragonswap-app/assets/main/logos/0xc6bc81a0e287cc8103cc002147a9d76cae4cd6e5/logo.png",
+        "https://assets.cambrian.wtf/logos/ballz.png",
     },
   },
   "0xf5020dc8ec5e0ef8869ecc3044933356650b61cf": {
@@ -218,7 +218,7 @@ export const TOKENS: { [key: `0x${string}`]: IToken } = {
       decimals: 18,
       initialSupply: "10000000000000000000000000000000",
       logoUrl:
-        "https://raw.githubusercontent.com/dragonswap-app/assets/main/logos/0xf5020DC8eC5e0ef8869Ecc3044933356650b61Cf/logo.png",
+        "https://assets.cambrian.wtf/logos/jayjeo.png",
     },
   },
   "0x6291148ae49e0f0d847bb97c4e060e49d87638ba": {
@@ -230,7 +230,7 @@ export const TOKENS: { [key: `0x${string}`]: IToken } = {
       decimals: 18,
       initialSupply: "10000000000000000000000000000000",
       logoUrl:
-        "https://raw.githubusercontent.com/dragonswap-app/assets/main/logos/0x6291148AE49e0f0d847bB97C4E060E49D87638bA/logo.png",
+        "https://assets.cambrian.wtf/logos/rex.png",
     },
   },
   "0x80eede496655fb9047dd39d9f418d5483ed600df": {
@@ -602,7 +602,7 @@ export const TOKENS: { [key: `0x${string}`]: IToken } = {
       decimals: 8,
       initialSupply: "1000000000000000000000",
       logoUrl:
-        "https://raw.githubusercontent.com/dragonswap-app/assets/refs/heads/main/logos/0x0555E30da8f98308EdB960aa94C0Db47230d2B9c/logo.png",
+        "https://assets.cambrian.wtf/logos/wbtc.png",
     },
   },
   "0x83c82f0f959ad3eff528ee513b43808aa53f4b37": {
@@ -614,7 +614,7 @@ export const TOKENS: { [key: `0x${string}`]: IToken } = {
       decimals: 6,
       initialSupply: "1000000000000000000000",
       logoUrl:
-        "https://raw.githubusercontent.com/dragonswap-app/assets/104eff3940183741fd9d7fa598e4d1fda7677299/logos/0x83c82f0f959aD3eff528eE513b43808Aa53f4B37/logo.png",
+        "https://assets.cambrian.wtf/logos/rock.png",
     },
   },
   "0x09d9420332bff75522a45fcff4855f82a0a3ff50": {

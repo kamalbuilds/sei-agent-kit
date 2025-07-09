@@ -18,6 +18,16 @@ export async function swap(
 ): Promise<string> {
   try {
     console.log(`Swapping ${amount} ${tokenIn} to ${tokenOut}...`);
+    if (tokenIn === '0x0') {
+      if (Number(await agent.getERC20Balance()) < Number(amount)) {
+        console.log(`Insufficient balance of sei`);
+        throw new Error("Insufficient balance");
+      }
+    }
+    else if (Number(await agent.getERC20Balance(tokenIn)) < Number(amount)) {
+      console.log(`Insufficient balance of ${tokenIn}`);
+      throw new Error("Insufficient balance");
+    }
     const symphonySDK = new Symphony({ walletClient: agent.walletClient });
 
     // Connect wallet client to Symphony SDK

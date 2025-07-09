@@ -6,6 +6,7 @@ import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { ChatOpenAI } from "@langchain/openai";
 import * as dotenv from "dotenv";
 import * as readline from "readline";
+import { ModelProviderName } from "../src/types";
 
 dotenv.config();
 
@@ -30,16 +31,16 @@ function checkRequiredEnvVars(): void {
 
 async function setupAgent() {
   try {
+    
     const llm = new ChatOpenAI({
-      modelName: "gpt-4o-mini",
-      temperature: 0.1,
+      model: "gpt-4o",
+      temperature: 0,
     });
+  
 
     const agentInstance = new SeiAgentKit(
       process.env.SEI_PRIVATE_KEY!,
-      {
-        OPENAI_API_KEY: process.env.OPENAI_API_KEY!,
-      },
+      ModelProviderName.OPENAI,
     );
     const agentTools = createSeiTools(agentInstance);
 
@@ -51,14 +52,13 @@ async function setupAgent() {
       tools: agentTools,
       checkpointSaver: memory,
       messageModifier: `
-        You are a helpful agent that can interact onchain using the Sei Agent Kit. You are
-        empowered to interact onchain using your tools. If you ever need funds, you can request them from the
-        faucet.  If not, you can provide your wallet details and request funds from the user. If there is a 5XX
-        (internal) HTTP error code, ask the user to try again later. All users wallet infos are already provided on the tool kit. If someone asks you to do something you
-        can't do with your currently available tools, you must say so, and encourage them to implement it
-        themselves using the Sei Agent Kit, recommend they go to the twitter account https://x.com/cambrian_ai for more information. Be
-        concise and helpful with your responses. Refrain from restating your tools' descriptions unless it is explicitly requested.
-        If the user tries to exit the conversation, just tell them that by typing "bye" they can end the conversation.
+        You are a lively and witty agent created by Cambrian AI, designed to interact onchain using the Sei Agent Kit. 
+        You have a knack for humor and enjoy making the interaction enjoyable while being efficient. 
+        If there is a 5XX (internal) HTTP error code, humorously suggest the user try again later. 
+        All users' wallet infos are already provided on the tool kit. If someone asks you to do something you
+        can't do with your currently available tools, respond with a playful apology and encourage them to implement it
+        themselves using the Sei Agent Kit repository that they can find on https://github.com/CambrianAgents/sei-agent-kit. Suggest they visit the Twitter account https://x.com/cambrian_ai or the website https://www.cambrian.wtf/ for more information, perhaps with a light-hearted comment about the wonders of the internet. Be concise, helpful, and sprinkle in some humor with your responses. Refrain from restating your tools' descriptions unless it is explicitly requested.
+        If the user tries to exit the conversation, cheerfully inform them that by typing "bye" they can end the conversation, maybe with a friendly farewell message.
       `,
     });
 
@@ -134,10 +134,4 @@ async function main() {
 
 export { setupAgent, startInteractiveSession };
 
-if (require.main === module) {
-  checkRequiredEnvVars();
-  main().catch((error) => {
-    console.error("Fatal error:", error);
-    process.exit(1);
-  });
-}
+main();

@@ -20,8 +20,9 @@ import {
   deleteStrategy,
   getUserStrategies,
   updateStrategy,
+  postTweet, TwitterPostTweetSchema, getAccountDetails, getAccountMentions, TwitterAccountMentionsSchema, postTweetReply, TwitterPostTweetReplySchema,
+  citrexDeposit, citrexWithdraw, citrexGetProducts, citrexGetOrderBook, citrexGetAccountHealth, citrexGetTickers, citrexCalculateMarginRequirement, citrexGetKlines, citrexGetProduct, citrexGetServerTime, citrexGetTradeHistory, citrexCancelAndReplaceOrder, citrexCancelOpenOrdersForProduct, citrexCancelOrder, citrexCancelOrders, citrexListBalances, citrexListOpenOrders, citrexListPositions, citrexPlaceOrder, citrexPlaceOrders
 } from '../tools';
-import { Config } from '../interfaces';
 import {
   mintTakara,
   borrowTakara,
@@ -34,21 +35,23 @@ import {
 } from '../tools/takara';
 import { swap } from '../tools/symphony/swap';
 import { StrategyType } from "../tools/carbon";
+import { getTokenForProvider } from './modelProvider';
+import { ModelProviderName } from '../types';
+import { z } from 'zod';
 
 export class SeiAgentKit {
   public publicClient: ViemPublicClient;
   public walletClient: ViemWalletClient;
   public wallet_address: Address;
-  public config: Config;
-
+  public token: string | undefined;
   /**
    * Creates a new SeiAgentKit instance
    * @param private_key The private key for the wallet
-   * @param configOrKey The configuration object or OpenAI API key
+   * @param provider The model provider to use
    */
   constructor(
     private_key: string,
-    configOrKey: Config | string | null,
+    provider: any,
   ) {
     const account = privateKeyToAccount(private_key as Address);
     this.publicClient = createPublicClient({
@@ -62,12 +65,7 @@ export class SeiAgentKit {
       transport: http()
     });
 
-    // Handle both old and new patterns
-    if (typeof configOrKey === "string" || configOrKey === null) {
-      this.config = { OPENAI_API_KEY: configOrKey || "" };
-    } else {
-      this.config = configOrKey;
-    }
+    this.token = getTokenForProvider(provider);
   }
 
   /**
@@ -175,7 +173,7 @@ export class SeiAgentKit {
     return swap(this, amount, tokenIn, tokenOut);
   }
 
-  
+
   // Takara Protocol methods
   /**
    * Mints tTokens by depositing underlying tokens into the Takara Protocol
@@ -214,7 +212,7 @@ export class SeiAgentKit {
    * @param redeemType Whether to redeem underlying tokens or tTokens
    * @returns Transaction details and redemption status
    */
- async redeemTakara(ticker: string, redeemAmount: string, redeemType: RedeemTakaraParams['redeemType'] = 'underlying') {
+  async redeemTakara(ticker: string, redeemAmount: string, redeemType: RedeemTakaraParams['redeemType'] = 'underlying') {
     return redeemTakara(this, { ticker, redeemAmount, redeemType });
   }
 
@@ -245,7 +243,6 @@ export class SeiAgentKit {
     }
     return getBorrowBalance(this, tTokenAddress, userAddress);
   }
-
 
   // Carbon SDK Methods
   /**
@@ -292,6 +289,227 @@ export class SeiAgentKit {
     overrides?: PayableOverrides
   ): Promise<string | null> {
     return composeTradeByTargetTx(this, config, sourceToken, targetToken, tradeActions, deadline, maxInput, overrides);
+  }
+
+  /**
+   * Posts a tweet to Twitter
+   * @param tweet The tweet to post
+   * @returns Transaction hash and tweet details
+   */
+  async postTweet(tweet: z.infer<typeof TwitterPostTweetSchema>) {
+    return postTweet(tweet);
+  }
+
+  /**
+   * Retrieves details about the authenticated user's Twitter account
+   * @returns Account details as a string
+   */
+  async getAccountDetails() {
+    return getAccountDetails();
+  }
+
+  /**
+   * Retrieves mentions for the authenticated user's Twitter account
+   * @returns Mentions as a string
+   */
+  async getAccountMentions(args: z.infer<typeof TwitterAccountMentionsSchema>) {
+    return getAccountMentions(args);
+  }
+
+  /**
+   * Posts a reply to a tweet on Twitter
+   * @param args The arguments for posting a reply
+   * @returns Transaction hash and reply details
+   */
+  async postTweetReply(args: z.infer<typeof TwitterPostTweetReplySchema>) {
+    return postTweetReply(args);
+  }
+
+  // Citrex Protocol methods
+  /**
+   * Deposits USDC tokens into the Citrex Protocol
+   * @param amount The amount of USDC to deposit as a string (e.g., "1.5" for 1.5 USDC)
+   * @returns Promise with transaction hash or error message
+   */
+  async citrexDeposit(amount: string) {
+    return citrexDeposit(amount);
+  }
+
+  /**
+   * Withdraws USDC tokens from the Citrex Protocol
+   * @param amount The amount of USDC to withdraw as a string (e.g., "1.5" for 1.5 USDC)
+   * @returns Promise with transaction hash or error message
+   */
+  async citrexWithdraw(amount: string) {
+    return citrexWithdraw(amount);
+  }
+
+  /**
+   * Retrieves all products from the Citrex Protocol
+   * @returns Promise with products or error message
+   */
+  async citrexGetProducts() {
+    return citrexGetProducts();
+  }
+
+  /**
+   * Retrieves the order book for a product from the Citrex Protocol
+   * @param symbol The symbol of the product (e.g., "ethperp")
+   * @returns Promise with order book or error message
+   */
+  async citrexGetOrderBook(symbol: string) {
+    return citrexGetOrderBook(symbol);
+  }
+
+  /**
+   * Retrieves the account health for the Citrex Protocol
+   * @returns Promise with account health or error message
+   */
+  async citrexGetAccountHealth() {
+    return citrexGetAccountHealth();
+  }
+
+  /**
+   * Retrieves the tickers for the Citrex Protocol
+   * @returns Promise with tickers or error message
+   */
+  async citrexGetTickers(symbol?: `${string}perp`) {
+    if (symbol) {
+      return citrexGetTickers(symbol);
+    } else {
+      return citrexGetTickers();
+    }
+  }
+
+  /**
+   * Calculates the required margin for a new order on Citrex Protocol
+   * @param isBuy Whether to buy (true) or sell (false)
+   * @param price The price of the asset for the order
+   * @param productId The product ID of the asset
+   * @param quantity The quantity of the asset to order
+   * @returns Promise with the required margin calculation result
+   */
+  async citrexCalculateMarginRequirement(isBuy: boolean, price: number, productId: number, quantity: number) {
+    return citrexCalculateMarginRequirement(isBuy, price, productId, quantity);
+  }
+
+  /**
+   * Retrieves K-line (candlestick) chart data for a product on Citrex Protocol
+   * @param productSymbol The product symbol (e.g., 'btcperp', 'ethperp')
+   * @param optionalArgs Optional arguments for the query
+   * @returns Promise with K-line data
+   */
+  async citrexGetKlines(productSymbol: `${string}perp`, optionalArgs?: any) {
+    return citrexGetKlines(productSymbol, optionalArgs);
+  }
+
+  /**
+   * Retrieves information about a specific product on Citrex Protocol
+   * @param identifier The product ID or symbol
+   * @returns Promise with product information
+   */
+  async citrexGetProduct(identifier: number | string) {
+    return citrexGetProduct(identifier);
+  }
+
+  /**
+   * Retrieves the current server time from Citrex Protocol
+   * @returns Promise with server time information
+   */
+  async citrexGetServerTime() {
+    return citrexGetServerTime();
+  }
+
+  /**
+   * Retrieves trade history for a product on Citrex Protocol
+   * @param productSymbol The product symbol (e.g., 'btcperp', 'ethperp')
+   * @param quantity Optional number of trades to fetch
+   * @returns Promise with trade history data
+   */
+  async citrexGetTradeHistory(productSymbol: `${string}perp`, quantity?: number) {
+    return citrexGetTradeHistory(productSymbol, quantity);
+  }
+
+  /**
+   * Cancels and replaces an order on Citrex Protocol
+   * @param orderId The unique ID of the order to replace
+   * @param orderArgs The new order arguments
+   * @returns Promise with the new order information
+   */
+  async citrexCancelAndReplaceOrder(orderId: `0x${string}`, orderArgs: any) {
+    return citrexCancelAndReplaceOrder(orderId, orderArgs);
+  }
+
+  /**
+   * Cancels all open orders for a specific product on Citrex Protocol
+   * @param productId The product ID for which to cancel all orders
+   * @returns Promise with cancellation result
+   */
+  async citrexCancelOpenOrdersForProduct(productId: number) {
+    return citrexCancelOpenOrdersForProduct(productId);
+  }
+
+  /**
+   * Cancels a specific order on Citrex Protocol
+   * @param orderId The unique ID of the order to cancel
+   * @param productId The product ID of the order
+   * @returns Promise with cancellation result
+   */
+  async citrexCancelOrder(orderId: `0x${string}`, productId: number) {
+    return citrexCancelOrder(orderId, productId);
+  }
+
+  /**
+   * Cancels multiple orders on Citrex Protocol
+   * @param ordersArgs Array of [orderId, productId] pairs
+   * @returns Promise with cancellation results
+   */
+  async citrexCancelOrders(ordersArgs: [`0x${string}`, number][]) {
+    return citrexCancelOrders(ordersArgs);
+  }
+
+  /**
+   * Lists all account balances on Citrex Protocol
+   * @returns Promise with account balances
+   */
+  async citrexListBalances() {
+    return citrexListBalances();
+  }
+
+  /**
+   * Lists all open orders on Citrex Protocol
+   * @param productSymbol Optional product symbol to filter orders
+   * @returns Promise with open orders
+   */
+  async citrexListOpenOrders(productSymbol?: `${string}perp`) {
+    return citrexListOpenOrders(productSymbol);
+  }
+
+  /**
+   * Lists all positions on Citrex Protocol
+   * @param productSymbol Optional product symbol to filter positions
+   * @returns Promise with positions
+   */
+  async citrexListPositions(productSymbol?: `${string}perp`) {
+    return citrexListPositions(productSymbol);
+  }
+
+  /**
+   * Places a single order on Citrex Protocol
+   * @param orderArgs The order arguments
+   * @returns Promise with order placement result
+   */
+  async citrexPlaceOrder(orderArgs: any) {
+    return citrexPlaceOrder(orderArgs);
+  }
+
+  /**
+   * Places multiple orders on Citrex Protocol
+   * @param ordersArgs Array of order arguments
+   * @returns Promise with order placement results
+   */
+  async citrexPlaceOrders(ordersArgs: any[]) {
+    return citrexPlaceOrders(ordersArgs);
   }
 
   /**
@@ -400,5 +618,5 @@ export class SeiAgentKit {
   ): Promise<string | null> {
     return updateStrategy(this, config, strategyId, update, encoded, buyPriceMarginal, sellPriceMarginal, overrides);
   }
-  
+
 }

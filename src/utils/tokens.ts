@@ -1,5 +1,5 @@
 import { TOKENS } from "../constants";
-import { IToken } from "../interfaces";
+import { IToken } from "../types";
 
 export function getTokenDenomByAddress(address: `0x${string}`): string {
   return TOKENS[address]?.attributes.symbol;

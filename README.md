@@ -26,9 +26,9 @@ This toolkit bridges the gap between AI and blockchain interaction, enabling the
 - **Token Operations**: Complete SEI ERC-20 and ERC-721 token management
 - **DeFi Protocol Integration**: Seamless interaction with SEI's DeFi ecosystem
 - **Swap Functionality**: Token swapping through Symphony aggregator
-- **Liquidity Management**: Add and remove liquidity with DragonSwap
 - **Lending & Borrowing**: Interact with Takara protocol for lending operations
 - **Staking Operations**: Stake and unstake SEI tokens with Silo
+- **Perpetual Trading**: Trade perpetual contracts on Citrex protocol
 - **LangChain Integration**: Build AI agents with LangChain and LangGraph
 
 ## 📋 Supported Protocols
@@ -37,9 +37,9 @@ The Cambrian Agent Kit integrates with a variety of protocols and services:
 
 ### DeFi Protocols
 - **Symphony**: Token swapping and routing
-- **DragonSwap**: Liquidity pool operations
 - **Takara**: Lending and borrowing platform
 - **Silo**: Staking and yield farming
+- **Citrex**: Perpetual trading platform
 
 ### Token Standards
 - **SEI ERC-20**: Complete token operations
@@ -79,12 +79,13 @@ npm run test
 - [Twitter](https://x.com/cambrian_ai)
 - [Website](https://cambrian.wtf)
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+Check out our [Tool Creation Guide](CreateTool.md) for instructions on how to create and add new tools to the toolkit.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 ---
