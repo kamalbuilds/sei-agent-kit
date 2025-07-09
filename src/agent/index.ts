@@ -12,7 +12,7 @@ import { TradeActionBNStr, PayableOverrides, StrategyUpdate, EncodedStrategyBNSt
 import { ContractsConfig } from '@bancor/carbon-sdk/contracts-api';
 import { MarginalPriceOptions } from '@bancor/carbon-sdk/strategy-management';
 import {
-  get_erc20_balance, erc20_transfer, get_erc721_balance, erc721Transfer, erc721Mint, stakeSei, unstakeSei, getTokenAddressFromTicker, addLiquidity, removeLiquidity,
+  get_erc20_balance, erc20_transfer, get_erc721_balance, erc721Transfer, erc721Mint, stakeSei, unstakeSei, getTokenAddressFromTicker,
   composeTradeBySourceTx,
   composeTradeByTargetTx,
   createBuySellStrategy,
@@ -246,51 +246,6 @@ export class SeiAgentKit {
     return getBorrowBalance(this, tTokenAddress, userAddress);
   }
 
-  // DragonSwap methods
-  /**
-   * Adds liquidity to a DragonSwap pool
-   * @param token0 The first token address
-   * @param token1 The second token address
-   * @param amount0 The amount of the first token to add as a string (e.g., "1.5")
-   * @param amount1 The amount of the second token to add as a string (e.g., "100")
-   * @param fee The fee tier of the pool (e.g., 500 for 0.05%, 3000 for 0.3%, 10000 for 1%)
-   * @param tickLower The lower tick of the position
-   * @param tickUpper The upper tick of the position
-   * @returns Transaction hash or details
-   */
-  async addDragonSwapLiquidity(
-    token0: Address,
-    token1: Address,
-    amount0: string,
-    amount1: string,
-    fee: number,
-    tickLower: number,
-    tickUpper: number,
-  ): Promise<string> {
-    return addLiquidity(
-      this,
-      token0,
-      token1,
-      amount0,
-      amount1,
-      fee,
-      tickLower,
-      tickUpper
-    );
-  }
-
-  /**
-   * Removes liquidity from a DragonSwap pool
-   * @param tokenId The ID of the NFT position token
-   * @param liquidity Optional: The amount of liquidity to remove (if undefined, removes all)
-   * @returns Transaction hash or details
-   */
-  async removeDragonSwapLiquidity(
-    tokenId: bigint,
-    liquidity?: bigint,
-  ): Promise<string> {
-    return removeLiquidity(this, tokenId, liquidity);
-  }
 
   // Carbon SDK Methods
   /**
