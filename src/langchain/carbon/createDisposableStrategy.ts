@@ -18,7 +18,7 @@ export class CarbonCreateDisposableStrategyTool extends StructuredTool<
   typeof CreateStrategyDisposableInputSchema
 > {
   name = "carbon_create_disposable_strategy";
-  description = `Creates a Disposable Carbon strategy. 
+  description = `Creates a Disposable Carbon strategy. Also called a limit/range order.
   
   Parameters:
   - token0Ticker: The ticker symbol of the first token (e.g., "SEI").

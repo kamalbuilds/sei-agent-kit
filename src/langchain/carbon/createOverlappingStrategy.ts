@@ -19,7 +19,7 @@ export class CarbonCreateOverlappingStrategyTool extends StructuredTool<
   typeof CreateOverlappingStrategyInputSchema
 > {
   name = "carbon_create_overlapping_strategy";
-  description = `Creates a Carbon overlapping (LP) strategy. 
+  description = `Creates a Carbon overlapping strategy. Also called a liquidity position.
   If either buyPriceLow or sellPriceHigh are not defined, USD prices will be used to achieve a +-10% range.
 
   
